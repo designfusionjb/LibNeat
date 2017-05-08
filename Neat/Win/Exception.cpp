@@ -91,7 +91,7 @@ namespace Neat::Win
 			m_errorCode,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 			&m_message[0],
-			m_message.size(),
+			(DWORD)m_message.size(),
 			nullptr);
 
 		if (0 == end)

@@ -108,6 +108,8 @@ namespace Neat
 			{
 				int* a = nullptr;
 				auto b = *a;
+				if (b)
+					Logger::WriteMessage("Shouldn't get to this line!!!");
 			});
 		}
 
