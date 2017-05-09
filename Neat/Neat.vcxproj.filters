@@ -48,6 +48,9 @@
     <ClInclude Include="Win\Exception.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CmdLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Win\Exception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -117,6 +117,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CmdLine.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Handle.h" />
     <ClInclude Include="stdafx.h" />
@@ -130,6 +131,7 @@
     <ClInclude Include="Win\Function.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CmdLine.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="stdafx.cpp">
