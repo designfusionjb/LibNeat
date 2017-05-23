@@ -137,11 +137,15 @@
     <ClInclude Include="Win\InternetHandle.h" />
     <ClInclude Include="Win\MsiHandle.h" />
     <ClInclude Include="Win\Function.h" />
+    <ClInclude Include="Win\Directory.h" />
+    <ClInclude Include="Win\File.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CmdLine.cpp" />
     <ClCompile Include="Convert.cpp" />
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="Win\Directory.cpp" />
+    <ClCompile Include="Win\File.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

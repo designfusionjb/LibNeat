@@ -80,7 +80,7 @@ namespace Neat
 					"--not-a-command",
 					"value2"
 				};
-				const auto argc = static_cast<int>(std::size(argv));
+				const auto argc = static_cast<int32_t>(std::size(argv));
 
 				CmdLine cmdLine;
 				cmdLine.Parse(argc, argv);
