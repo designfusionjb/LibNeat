@@ -117,9 +117,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Allocator.h" />
     <ClInclude Include="CmdLine.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="FallbackAllocator.h" />
     <ClInclude Include="Handle.h" />
+    <ClInclude Include="MallocAllocator.h" />
+    <ClInclude Include="StackAllocator.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Types.h" />
