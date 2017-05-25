@@ -12,7 +12,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat
 {
-	TEST_CLASS(FallbackAllocator_Test)
+	TEST_CLASS(FallbackAllocatorTest)
 	{
 	public:
 		TEST_METHOD(FallbackAllocator_Basic)

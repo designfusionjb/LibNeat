@@ -10,7 +10,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat
 {
-	TEST_CLASS(StackAllocator_Test)
+	TEST_CLASS(StackAllocatorTest)
 	{
 	public:
 		TEST_METHOD(StackAllocator_Basic)

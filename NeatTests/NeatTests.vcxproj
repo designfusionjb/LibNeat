@@ -140,7 +140,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BufferTest.cpp" />
     <ClCompile Include="CmdLineTest.cpp" />
+    <ClCompile Include="DefaultAllocatorTest.cpp" />
     <ClCompile Include="FallbackAllocatorTest.cpp" />
     <ClCompile Include="MallocAllocatorTest.cpp" />
     <ClCompile Include="NestedExceptionTest.cpp" />

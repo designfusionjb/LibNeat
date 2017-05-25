@@ -2,7 +2,7 @@
 #include <CppUnitTest.h>
 
 #include <Neat\Types.h>
-#include <Neat\MallocAllocator.h>
+#include <Neat\DefaultAllocator.h>
 
 #include <list>
 #include <map>
@@ -13,13 +13,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat
 {
-	TEST_CLASS(MallocAllocatorTest)
+	TEST_CLASS(DefaultAllocatorTest)
 	{
 	public:
-		TEST_METHOD(MallocAllocator_Vector)
+		TEST_METHOD(DefaultAllocator_Vector)
 		{
 			{
-				MallocAllocator alloc;
+				DefaultAllocator alloc;
 				std::vector<int64_t, Allocator<int64_t>> vec(&alloc);
 				vec.push_back(0);
 				vec.push_back(INT64_MIN);
@@ -31,7 +31,7 @@ namespace Neat
 				Assert::AreEqual(INT64_MAX, vec[2]);
 			}
 			{
-				MallocAllocator alloc;
+				DefaultAllocator alloc;
 				std::vector<int32_t, Allocator<int32_t>> vec(&alloc);
 				vec.reserve(4);
 				vec.push_back(0);
@@ -59,10 +59,10 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(MallocAllocator_String)
+		TEST_METHOD(DefaultAllocator_String)
 		{
 			{
-				MallocAllocator alloc;
+				DefaultAllocator alloc;
 				std::basic_string<char, std::char_traits<char>, Allocator<char>> string(&alloc);
 				string = "Foo";
 				string += " ";
@@ -70,7 +70,7 @@ namespace Neat
 				Assert::AreEqual("Foo bar", string.c_str());
 			}
 			{
-				MallocAllocator alloc;
+				DefaultAllocator alloc;
 				std::basic_string<wchar_t, std::char_traits<wchar_t>, Allocator<wchar_t>> string(&alloc);
 				string = L"Foo";
 				string += L" ";
@@ -79,10 +79,10 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(MallocAllocator_Map)
+		TEST_METHOD(DefaultAllocator_Map)
 		{
 			using namespace std;
-			MallocAllocator alloc;
+			DefaultAllocator alloc;
 			std::map<uint8_t, std::string, std::less<uint8_t>, Allocator<std::pair<const uint8_t, std::string>>> map(&alloc);
 			map[2] = "Two";
 			map[4] = "Four";
@@ -93,12 +93,12 @@ namespace Neat
 			Assert::AreEqual("Eight"s, map[8]);
 		}
 
-		TEST_METHOD(MallocAllocator_List)
+		TEST_METHOD(DefaultAllocator_List)
 		{
 			typedef std::basic_string<wchar_t, std::char_traits<wchar_t>, Allocator<wchar_t>> String;
 			typedef std::list<String, Allocator<String>> List;
 
-			MallocAllocator alloc;
+			DefaultAllocator alloc;
 			List list(&alloc);
 			list.push_back(String(L"brown", &alloc));
 			list.push_back(String(L"fox", &alloc));
