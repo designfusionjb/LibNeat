@@ -9,7 +9,7 @@ namespace Neat
 	TEST_CLASS(ExceptionTest)
 	{
 	public:
-		TEST_METHOD(ExceptionBasic)
+		TEST_METHOD(Exception_Basic)
 		{
 			try
 			{
@@ -21,7 +21,7 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(ExceptionAdvanced)
+		TEST_METHOD(Exception_Advanced)
 		{
 			try
 			{
@@ -37,7 +37,7 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(ExceptionWithCodeBasic)
+		TEST_METHOD(ExceptionWithCode_Basic)
 		{
 			try
 			{
@@ -49,7 +49,7 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(ExceptionWithCodeAdvanced)
+		TEST_METHOD(ExceptionWithCode_Advanced)
 		{
 			try
 			{

@@ -13,7 +13,10 @@ namespace Neat
 	public:
 		typedef T Element;
 
+		explicit BufferT(IAllocator* allocator);
+		// Accepts size in bytes
 		explicit BufferT(size_t size = 0, IAllocator* allocator = nullptr);
+		// Accepts size in bytes
 		BufferT(const T* buffer, size_t size, IAllocator* allocator = nullptr);
 		BufferT(const BufferT& other);
 		BufferT(BufferT&& other);
@@ -23,6 +26,8 @@ namespace Neat
 		void Free();
 
 		BufferT& Append(const T* buffer, size_t size);
+
+		IAllocator* GetAllocator() const;
 
 		operator const T*() const;
 		operator T*();
@@ -83,6 +88,14 @@ namespace Neat
 			return !operator==(left, right);
 		}
 	};
+
+	template <typename T>
+	BufferT<T>::BufferT(IAllocator* allocator) :
+		m_allocator(allocator),
+		m_buffer(nullptr),
+		m_size(0)
+	{
+	}
 
 	template <typename T>
 	BufferT<T>::BufferT(size_t size, IAllocator* allocator) :
@@ -164,6 +177,12 @@ namespace Neat
 		memcpy_s(p + m_size, other.m_size - m_size, buffer, size);
 		swap(*this, other);
 		return *this;
+	}
+
+	template <typename T>
+	IAllocator* BufferT<T>::GetAllocator() const
+	{
+		return m_allocator;
 	}
 
 	template <typename T>

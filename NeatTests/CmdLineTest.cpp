@@ -21,7 +21,7 @@ namespace Neat
 	TEST_CLASS(CmdLineTest)
 	{
 	public:
-		TEST_METHOD(CmdLineParseCommand)
+		TEST_METHOD(CmdLine_ParseCommand)
 		{
 			{
 				const auto pair = CmdLine::ParseCommand("--foo");
@@ -60,7 +60,7 @@ namespace Neat
 			}
 		}
 
-		TEST_METHOD(CmdLineParse)
+		TEST_METHOD(CmdLine_Parse)
 		{
 			{
 				const char* argv[] =
@@ -80,7 +80,7 @@ namespace Neat
 					"--not-a-command",
 					"value2"
 				};
-				const int argc = std::size(argv);
+				const auto argc = static_cast<int>(std::size(argv));
 
 				CmdLine cmdLine;
 				cmdLine.Parse(argc, argv);

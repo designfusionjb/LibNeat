@@ -11,7 +11,7 @@ namespace Neat::Win
 	TEST_CLASS(WinExceptionTest)
 	{
 	public:
-		TEST_METHOD(StructuredExceptionBasic)
+		TEST_METHOD(StructuredException_Basic)
 		{
 			try
 			{
@@ -23,7 +23,7 @@ namespace Neat::Win
 			}
 		}
 
-		TEST_METHOD(StructuredExceptionAdvanced)
+		TEST_METHOD(StructuredException_Advanced)
 		{
 			try
 			{
@@ -40,7 +40,7 @@ namespace Neat::Win
 			}
 		}
 
-		TEST_METHOD(StructuredExceptionEnable)
+		TEST_METHOD(StructuredException_Enable)
 		{
 			StructuredException::EnableInThisThread();
 			Assert::ExpectException<StructuredException>([]()
@@ -48,11 +48,11 @@ namespace Neat::Win
 				int* a = nullptr;
 				auto b = *a;
 				if (b)
-					Logger::WriteMessage("Shouldn't get to this line!!!");
+					Assert::Fail(L"Shouldn't get to this line!!!");
 			});
 		}
 
-		TEST_METHOD(Win32ExceptionBasic)
+		TEST_METHOD(Win32Exception_Basic)
 		{
 			try
 			{
@@ -64,7 +64,7 @@ namespace Neat::Win
 			}
 		}
 
-		TEST_METHOD(Win32ExceptionAdvanced)
+		TEST_METHOD(Win32Exception_Advanced)
 		{
 			try
 			{
@@ -81,7 +81,7 @@ namespace Neat::Win
 			}
 		}
 
-		TEST_METHOD(LastErrorExceptionBasic)
+		TEST_METHOD(LastErrorException_Basic)
 		{
 			try
 			{
@@ -94,7 +94,7 @@ namespace Neat::Win
 			}
 		}
 
-		TEST_METHOD(LastErrorExceptionAdvanced)
+		TEST_METHOD(LastErrorException_Advanced)
 		{
 			try
 			{
