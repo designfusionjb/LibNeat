@@ -191,20 +191,20 @@ namespace Neat
 
 		TEST_METHOD(Buffer_CustomAllocator)
 		{
-			StackAllocator<20> alloc;
-			BufferT<wchar_t> defaultBuffer(L"Foo", 3);
+			StackAllocator<40> alloc;
+			BufferT<wchar_t> defaultBuffer(L"Foo", 6);
 
 			BufferT<wchar_t> customBuffer(3, &alloc);
 			customBuffer = defaultBuffer;
-			customBuffer.Append(L"Bar", 4);
+			customBuffer.Append(L"Bar", 8);
 
 			const auto data = customBuffer.GetBuffer();
 			const auto size = customBuffer.GetSize();
-			Assert::AreEqual(7_sz, size);
+			Assert::AreEqual(14_sz, size);
 			Assert::AreEqual(L"FooBar", data);
 
 			const auto capacity = alloc.GetCapacity();
-			Assert::AreEqual(0_sz, capacity);
+			Assert::AreNotEqual(0_sz, capacity);
 		}
 	};
 }

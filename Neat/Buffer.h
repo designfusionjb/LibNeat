@@ -65,7 +65,7 @@ namespace Neat
 				return 0 == left.m_size;
 			if (0 == left.m_size)
 				return nullptr == right;
-			return 0 == memcmp(right, left.m_buffer, sizeof(T) * left.m_size);
+			return 0 == memcmp(right, left.m_buffer, left.m_size);
 		}
 
 		friend bool operator!=(const BufferT& left, const T* right)
@@ -94,7 +94,7 @@ namespace Neat
 			DoAllocate(size);
 
 		if (m_buffer)
-			memset(m_buffer, 0, sizeof(T) * m_size);
+			memset(m_buffer, 0, m_size);
 	}
 
 	template <typename T>
@@ -107,7 +107,7 @@ namespace Neat
 			DoAllocate(size);
 
 		if (m_buffer)
-			memcpy(m_buffer, buffer, sizeof(T) * m_size);
+			memcpy(m_buffer, buffer, m_size);
 	}
 
 	template <typename T>
@@ -140,7 +140,7 @@ namespace Neat
 			DoAllocate(size);
 
 		if (m_buffer)
-			memset(m_buffer, 0, sizeof(T) * m_size);
+			memset(m_buffer, 0, m_size);
 	}
 
 	template <typename T>
@@ -148,9 +148,8 @@ namespace Neat
 	{
 		if (m_size > 0)
 		{
-			const auto bytes = sizeof(T) * m_size;
 			const auto p = reinterpret_cast<byte_t*>(m_buffer);
-			m_allocator ? m_allocator->Deallocate(p, bytes) : delete[] p;
+			m_allocator ? m_allocator->Deallocate(p, m_size) : delete[] p;
 			m_buffer = nullptr;
 			m_size = 0;
 		}
@@ -160,8 +159,9 @@ namespace Neat
 	BufferT<T>& BufferT<T>::Append(const T* buffer, size_t size)
 	{
 		BufferT other(m_size + size, m_allocator);
-		memcpy_s(other.m_buffer, sizeof(T) * other.m_size, m_buffer, sizeof(T) * m_size);
-		memcpy_s(other.m_buffer + m_size, sizeof(T) * (other.m_size - m_size), buffer, sizeof(T) * size);
+		memcpy_s(other.m_buffer, other.m_size, m_buffer, m_size);
+		const auto p = reinterpret_cast<byte_t*>(other.m_buffer);
+		memcpy_s(p + m_size, other.m_size - m_size, buffer, size);
 		swap(*this, other);
 		return *this;
 	}
@@ -209,7 +209,7 @@ namespace Neat
 		{
 			if (m_size == other.m_size)
 			{
-				memcpy(m_buffer, other.m_buffer, sizeof(T) * m_size);
+				memcpy(m_buffer, other.m_buffer, m_size);
 			}
 			else
 			{
@@ -249,7 +249,7 @@ namespace Neat
 		if (other.m_size > 0)
 		{
 			DoAllocate(other.m_size);
-			memcpy(m_buffer, other.m_buffer, sizeof(T) * m_size);
+			memcpy(m_buffer, other.m_buffer, m_size);
 		}
 	}
 
@@ -268,8 +268,7 @@ namespace Neat
 	template <typename T>
 	void BufferT<T>::DoAllocate(size_t size)
 	{
-		const auto bytes = sizeof(T) * size;
-		const auto p = m_allocator ? m_allocator->Allocate(bytes) : new byte_t[bytes];
+		const auto p = m_allocator ? m_allocator->Allocate(size) : new byte_t[size];
 		if (p)
 		{
 			m_buffer = reinterpret_cast<T*>(p);
