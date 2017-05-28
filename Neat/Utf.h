@@ -828,6 +828,12 @@ namespace Neat
 
 	typedef StringT<char> Utf8;
 	typedef StringT<wchar_t> Utf16;
+
+	//
+	// By default use UTF-16 since it's used by Windows internally
+	//
+
+	typedef Utf16 String;
 }
 
 namespace Neat { namespace Details

@@ -8,7 +8,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat::Win
 {
-	TEST_CLASS(WinExceptionTest)
+	TEST_CLASS(ExceptionTest)
 	{
 	public:
 		TEST_METHOD(StructuredException_Basic)

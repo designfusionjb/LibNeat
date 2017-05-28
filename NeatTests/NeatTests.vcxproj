@@ -156,8 +156,9 @@
     </ClCompile>
     <ClCompile Include="ExceptionTest.cpp" />
     <ClCompile Include="UtfTest.cpp" />
-    <ClCompile Include="WinExceptionTest.cpp" />
-    <ClCompile Include="WinFunctionTest.cpp" />
+    <ClCompile Include="Win\ExceptionTest.cpp" />
+    <ClCompile Include="Win\FunctionTest.cpp" />
+    <ClCompile Include="Win\PathTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Neat\Neat.vcxproj">

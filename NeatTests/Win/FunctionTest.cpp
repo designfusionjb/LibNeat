@@ -19,10 +19,10 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat::Win
 {
-	TEST_CLASS(WinFunctionTest)
+	TEST_CLASS(FunctionTest)
 	{
 	public:
-		TEST_METHOD(FunctionWrapper)
+		TEST_METHOD(Function_Wrapper)
 		{
 			{
 				const auto moduleName = "Mssign32.dll";

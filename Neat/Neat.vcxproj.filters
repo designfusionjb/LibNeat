@@ -81,6 +81,12 @@
     <ClInclude Include="Win\Directory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Win\Path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win\Environment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -120,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Win\Directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win\Path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win\Environment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

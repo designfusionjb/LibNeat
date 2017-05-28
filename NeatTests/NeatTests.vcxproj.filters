@@ -32,12 +32,6 @@
     <ClCompile Include="ExceptionTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WinFunctionTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="WinExceptionTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NestedExceptionTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,6 +57,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ConvertTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win\PathTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win\ExceptionTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win\FunctionTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

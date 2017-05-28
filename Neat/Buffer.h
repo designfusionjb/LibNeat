@@ -2,6 +2,8 @@
 #include "Neat\Types.h"
 #include "Neat\Allocator.h"
 
+#include <type_traits>
+
 namespace Neat
 {
 	class IBuffer
