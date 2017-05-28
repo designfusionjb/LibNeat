@@ -2,7 +2,6 @@
 #include <Neat\Utf.h>
 #include <Neat\StackAllocator.h>
 
-#include <Windows.h>
 #include <CppUnitTest.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -59,8 +58,8 @@ namespace Neat
 			Assert::AreEqual(5_sz, string.GetSize());
 
 			char* ptr = string;
-			Assert::AreEqual(ptr, string.GetBuffer());
-			Assert::AreEqual("Some", string.GetBuffer());
+			Assert::AreEqual(ptr, string);
+			Assert::AreEqual("Some", string);
 		}
 
 		TEST_METHOD(String_Const)
@@ -74,8 +73,8 @@ namespace Neat
 			Assert::AreEqual(10_sz, string.GetSize());
 
 			const wchar_t* ptr = string;
-			Assert::AreEqual(ptr, string.GetBuffer());
-			Assert::AreEqual(L"Some", string.GetBuffer());
+			Assert::AreEqual(ptr, string);
+			Assert::AreEqual(L"Some", string);
 		}
 
 		TEST_METHOD(String_GetLength)
@@ -163,101 +162,101 @@ namespace Neat
 			auto pointerBad = arrayBad;
 
 			// Should throw "Utf8 string expected"
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf8::Format("%s", array16);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf8::Format("%s", pointer16);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf8::Format("%s", L"wchar_t");
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf8::Format("%s", arrayBad);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf8::Format("%s", pointerBad);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf8::Format("%s", 1);
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf16::Format(L"%S", array16);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf16::Format(L"%S", pointer16);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf16::Format(L"%S", L"wchar_t");
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf16::Format(L"%S", arrayBad);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf16::Format(L"%S", pointerBad);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf16::Format(L"%S", 1);
 			});
 
 			// Should throw "Utf16 string expected"
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf8::Format("%S", array8);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf8::Format("%S", pointer8);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf8::Format("%S", "char");
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf8::Format("%S", arrayBad);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf8::Format("%S", pointerBad);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf8::Format("%S", 1);
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf16::Format(L"%s", array8);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf16::Format(L"%s", pointer8);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf16::Format(L"%s", "char");
 			});
-			Assert::ExpectException<std::exception>([&]()
+			Assert::ExpectException<std::runtime_error>([&]()
 			{
 				Utf16::Format(L"%s", arrayBad);
 			});
-			Assert::ExpectException<std::exception>([=]()
+			Assert::ExpectException<std::runtime_error>([=]()
 			{
 				Utf16::Format(L"%s", pointerBad);
 			});
-			Assert::ExpectException<std::exception>([]()
+			Assert::ExpectException<std::runtime_error>([]()
 			{
 				Utf16::Format(L"%s", 1);
 			});
@@ -433,12 +432,12 @@ namespace Neat
 			string.Reserve(9);
 
 			const auto before = string.GetBuffer();
-			Assert::AreEqual(L"some", before);
+			Assert::AreEqual(L"some", string);
 
 			string = L"something";
 
 			const auto after = string.GetBuffer();
-			Assert::AreEqual(L"something", after);
+			Assert::AreEqual(L"something", string);
 			Assert::IsTrue(before == after);
 		}
 
@@ -897,47 +896,47 @@ namespace Neat
 			{
 				Utf16 string;
 				string.Trim(L"");
-				Assert::AreEqual(nullptr, string.GetBuffer());
+				Assert::AreEqual(nullptr, string);
 			}
 			{
 				Utf16 string(42);
 				string.Trim(L"");
-				Assert::AreEqual(L"", string.GetBuffer());
+				Assert::AreEqual(L"", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.Trim(nullptr);
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.Trim(L"");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.Trim(L"");
-				Assert::AreEqual(L" Foo bar ", string.GetBuffer());
+				Assert::AreEqual(L" Foo bar ", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.Trim(L" ");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"       Foo bar   ");
 				string.Trim(L"\t ");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"\tFoo bar\t");
 				string.Trim(L"\t");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"\t \t Foo bar \t \t");
 				string.Trim(L" \t");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 		}
 
@@ -946,47 +945,47 @@ namespace Neat
 			{
 				Utf16 string;
 				string.TrimLeft(L"");
-				Assert::AreEqual(nullptr, string.GetBuffer());
+				Assert::AreEqual(nullptr, string);
 			}
 			{
 				Utf16 string(42);
 				string.TrimLeft(L"");
-				Assert::AreEqual(L"", string.GetBuffer());
+				Assert::AreEqual(L"", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.TrimLeft(nullptr);
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.TrimLeft(L"");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.TrimLeft(L"");
-				Assert::AreEqual(L" Foo bar ", string.GetBuffer());
+				Assert::AreEqual(L" Foo bar ", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.TrimLeft(L" ");
-				Assert::AreEqual(L"Foo bar ", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar ", string);
 			}
 			{
 				Utf16 string(L"       Foo bar   ");
 				string.TrimLeft(L"\t ");
-				Assert::AreEqual(L"Foo bar   ", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar   ", string);
 			}
 			{
 				Utf16 string(L"\tFoo bar\t");
 				string.TrimLeft(L"\t");
-				Assert::AreEqual(L"Foo bar\t", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar\t", string);
 			}
 			{
 				Utf16 string(L"\t \t Foo bar \t \t");
 				string.TrimLeft(L" \t");
-				Assert::AreEqual(L"Foo bar \t \t", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar \t \t", string);
 			}
 		}
 
@@ -995,47 +994,47 @@ namespace Neat
 			{
 				Utf16 string;
 				string.TrimRight(L"");
-				Assert::AreEqual(nullptr, string.GetBuffer());
+				Assert::AreEqual(nullptr, string);
 			}
 			{
 				Utf16 string(42);
 				string.TrimRight(L"");
-				Assert::AreEqual(L"", string.GetBuffer());
+				Assert::AreEqual(L"", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.TrimRight(nullptr);
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L"Foo bar");
 				string.TrimRight(L"");
-				Assert::AreEqual(L"Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"Foo bar", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.TrimRight(L"");
-				Assert::AreEqual(L" Foo bar ", string.GetBuffer());
+				Assert::AreEqual(L" Foo bar ", string);
 			}
 			{
 				Utf16 string(L" Foo bar ");
 				string.TrimRight(L" ");
-				Assert::AreEqual(L" Foo bar", string.GetBuffer());
+				Assert::AreEqual(L" Foo bar", string);
 			}
 			{
 				Utf16 string(L"       Foo bar   ");
 				string.TrimRight(L"\t ");
-				Assert::AreEqual(L"       Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"       Foo bar", string);
 			}
 			{
 				Utf16 string(L"\tFoo bar\t");
 				string.TrimRight(L"\t");
-				Assert::AreEqual(L"\tFoo bar", string.GetBuffer());
+				Assert::AreEqual(L"\tFoo bar", string);
 			}
 			{
 				Utf16 string(L"\t \t Foo bar \t \t");
 				string.TrimRight(L" \t");
-				Assert::AreEqual(L"\t \t Foo bar", string.GetBuffer());
+				Assert::AreEqual(L"\t \t Foo bar", string);
 			}
 		}
 
@@ -1188,32 +1187,32 @@ namespace Neat
 			{
 				Utf16 string(L"");
 				string.ToLower();
-				Assert::AreEqual(L"", string.GetBuffer());
+				Assert::AreEqual(L"", string);
 			}
 			{
 				Utf16 string(L"abcdefghijklmnopqrstuvwxyz");
 				string.ToLower();
-				Assert::AreEqual(L"abcdefghijklmnopqrstuvwxyz", string.GetBuffer());
+				Assert::AreEqual(L"abcdefghijklmnopqrstuvwxyz", string);
 			}
 			{
 				Utf16 string(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 				string.ToLower();
-				Assert::AreEqual(L"abcdefghijklmnopqrstuvwxyz", string.GetBuffer());
+				Assert::AreEqual(L"abcdefghijklmnopqrstuvwxyz", string);
 			}
 			{
 				Utf16 string(L"Some0123");
 				string.ToLower();
-				Assert::AreEqual(L"some0123", string.GetBuffer());
+				Assert::AreEqual(L"some0123", string);
 			}
 			{
 				Utf16 string(L"100 KB");
 				string.ToLower();
-				Assert::AreEqual(L"100 kb", string.GetBuffer());
+				Assert::AreEqual(L"100 kb", string);
 			}
 			{
 				Utf16 string(L"Мои Документы");
 				string.ToLower();
-				Assert::AreEqual(L"мои документы", string.GetBuffer());
+				Assert::AreEqual(L"мои документы", string);
 			}
 		}
 
@@ -1222,32 +1221,32 @@ namespace Neat
 			{
 				Utf16 string(L"");
 				string.ToUpper();
-				Assert::AreEqual(L"", string.GetBuffer());
+				Assert::AreEqual(L"", string);
 			}
 			{
 				Utf16 string(L"abcdefghijklmnopqrstuvwxyz");
 				string.ToUpper();
-				Assert::AreEqual(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", string.GetBuffer());
+				Assert::AreEqual(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", string);
 			}
 			{
 				Utf16 string(L"abcdefghijklmnopqrstuvwxyz");
 				string.ToUpper();
-				Assert::AreEqual(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", string.GetBuffer());
+				Assert::AreEqual(L"ABCDEFGHIJKLMNOPQRSTUVWXYZ", string);
 			}
 			{
 				Utf16 string(L"some 123");
 				string.ToUpper();
-				Assert::AreEqual(L"SOME 123", string.GetBuffer());
+				Assert::AreEqual(L"SOME 123", string);
 			}
 			{
 				Utf16 string(L"100kb");
 				string.ToUpper();
-				Assert::AreEqual(L"100KB", string.GetBuffer());
+				Assert::AreEqual(L"100KB", string);
 			}
 			{
 				Utf16 string(L"Мои Документы");
 				string.ToUpper();
-				Assert::AreEqual(L"МОИ ДОКУМЕНТЫ", string.GetBuffer());
+				Assert::AreEqual(L"МОИ ДОКУМЕНТЫ", string);
 			}
 		}
 

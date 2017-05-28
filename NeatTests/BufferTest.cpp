@@ -28,7 +28,7 @@ namespace Neat
 			Assert::IsNotNull(buffer.GetBuffer());
 
 			int32_t* ptr = buffer;
-			Assert::IsTrue(ptr == buffer.GetBuffer());
+			Assert::IsTrue(reinterpret_cast<const byte_t*>(ptr) == buffer.GetBuffer());
 		}
 
 		TEST_METHOD(Buffer_Const)
@@ -40,7 +40,7 @@ namespace Neat
 			Assert::IsNotNull(buffer.GetBuffer());
 
 			const wchar_t* ptr = buffer;
-			Assert::IsTrue(ptr == buffer.GetBuffer());
+			Assert::IsTrue(reinterpret_cast<const byte_t*>(ptr) == buffer.GetBuffer());
 		}
 
 		TEST_METHOD(Buffer_CopyAssign)
@@ -140,6 +140,11 @@ namespace Neat
 
 			Assert::IsFalse(actual != expected);
 			Assert::IsFalse(expected != actual);
+
+			Buffer copy(actual);
+
+			Assert::IsTrue(copy == actual);
+			Assert::IsFalse(copy != actual);
 		}
 
 		TEST_METHOD(Buffer_Append)
@@ -198,10 +203,8 @@ namespace Neat
 			customBuffer = defaultBuffer;
 			customBuffer.Append(L"Bar", 8);
 
-			const auto data = customBuffer.GetBuffer();
-			const auto size = customBuffer.GetSize();
-			Assert::AreEqual(14_sz, size);
-			Assert::AreEqual(L"FooBar", data);
+			Assert::AreEqual(14_sz, customBuffer.GetSize());
+			Assert::AreEqual(L"FooBar", customBuffer);
 
 			const auto capacity = alloc.GetCapacity();
 			Assert::AreEqual(0_sz, capacity);

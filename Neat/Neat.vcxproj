@@ -120,6 +120,7 @@
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="CmdLine.h" />
+    <ClInclude Include="Convert.h" />
     <ClInclude Include="DefaultAllocator.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="FallbackAllocator.h" />
@@ -139,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CmdLine.cpp" />
+    <ClCompile Include="Convert.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="Handle.cpp" />
     <ClCompile Include="stdafx.cpp">

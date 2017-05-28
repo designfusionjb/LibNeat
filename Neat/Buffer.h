@@ -4,8 +4,19 @@
 
 namespace Neat
 {
+	class IBuffer
+	{
+	public:
+		virtual const byte_t* GetBuffer() const = 0;
+		virtual byte_t* GetBuffer() = 0;
+
+		// Returns size in bytes
+		virtual size_t GetSize() const = 0;
+		virtual bool IsEmpty() const = 0;
+	};
+
 	template <typename T>
-	class BufferT
+	class BufferT : public IBuffer
 	{
 		static_assert(std::is_trivial<T>::value, "Only trivial types are allowed!");
 		// For non trivial types use std::vector to ensure constructors are called.
@@ -32,12 +43,12 @@ namespace Neat
 		operator const T*() const;
 		operator T*();
 
-		const T* GetBuffer() const;
-		T* GetBuffer();
+		const byte_t* GetBuffer() const override;
+		byte_t* GetBuffer() override;
 
 		// Returns size in bytes
-		size_t GetSize() const;
-		bool IsEmpty() const;
+		size_t GetSize() const override;
+		bool IsEmpty() const override;
 
 		BufferT& operator=(const BufferT& other);
 		BufferT& operator=(BufferT&& other);
@@ -68,9 +79,11 @@ namespace Neat
 		{
 			if (nullptr == right)
 				return 0 == left.m_size;
+
 			if (0 == left.m_size)
 				return nullptr == right;
-			return 0 == memcmp(right, left.m_buffer, left.m_size);
+
+			return 0 == memcmp(reinterpret_cast<const byte_t*>(right), left.GetBuffer(), left.m_size);
 		}
 
 		friend bool operator!=(const BufferT& left, const T* right)
@@ -83,7 +96,20 @@ namespace Neat
 			return operator==(right, left);
 		}
 
-		friend bool operator!=(const T* left, const BufferT& right)
+		friend bool operator!=(const byte_t* left, const BufferT& right)
+		{
+			return !operator==(left, right);
+		}
+
+		friend bool operator==(const BufferT& left, const BufferT& right)
+		{
+			if (left.m_size != right.m_size)
+				return false;
+
+			return 0 == memcmp(left.m_buffer, right.m_buffer, left.m_size);
+		}
+
+		friend bool operator!=(const BufferT& left, const BufferT& right)
 		{
 			return !operator==(left, right);
 		}
@@ -198,15 +224,15 @@ namespace Neat
 	}
 
 	template <typename T>
-	const T* BufferT<T>::GetBuffer() const
+	const byte_t* BufferT<T>::GetBuffer() const
 	{
-		return m_buffer;
+		return reinterpret_cast<const byte_t*>(m_buffer);
 	}
 
 	template <typename T>
-	T* BufferT<T>::GetBuffer()
+	byte_t* BufferT<T>::GetBuffer()
 	{
-		return m_buffer;
+		return reinterpret_cast<byte_t*>(m_buffer);
 	}
 
 	template <typename T>

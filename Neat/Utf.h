@@ -2,6 +2,7 @@
 #include "Neat\Types.h"
 #include "Neat\Buffer.h"
 
+#include <exception>
 #include <type_traits>
 #include <vector>
 
@@ -318,7 +319,7 @@ namespace Neat
 	template <typename T, typename Traits>
 	bool StringT<T, Traits>::operator==(const StringT& other) const
 	{
-		return operator==(other.GetBuffer());
+		return operator==(other.operator const T*());
 	}
 
 	template <typename T, typename Traits>
@@ -330,7 +331,7 @@ namespace Neat
 	template <typename T, typename Traits>
 	bool StringT<T, Traits>::operator!=(const StringT& other) const
 	{
-		return operator!=(other.GetBuffer());
+		return operator!=(other.operator const T*());
 	}
 
 	template <typename T, typename Traits>
@@ -827,9 +828,6 @@ namespace Neat
 
 	typedef StringT<char> Utf8;
 	typedef StringT<wchar_t> Utf16;
-
-	// By default use UTF-16 since it's used by Windows internally
-	typedef Utf16 String;
 }
 
 namespace Neat { namespace Details
@@ -861,7 +859,7 @@ namespace Neat { namespace Details
 	template <typename T, typename Traits>
 	const T* NormalizeArg(const Neat::StringT<T, Traits>& arg)
 	{
-		return arg.GetBuffer();
+		return arg.operator const T*();
 	}
 
 	template <typename F>
