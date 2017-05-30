@@ -18,6 +18,11 @@ namespace Neat::Win
 			LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr,
 			HANDLE hTemplateFile = nullptr);
 
+		void Write(
+			LPCVOID lpBuffer,
+			DWORD nBytes,
+			LPOVERLAPPED lpOverlapped = nullptr);
+
 	private:
 		Handle m_handle;
 	};

@@ -48,7 +48,7 @@ namespace Neat::Win
 		return *this;
 	}
 
-	Path Path::operator+(const Path& other)
+	Path Path::operator+(const Path& other) const
 	{
 		Path path(*this);
 		path.Append(other);

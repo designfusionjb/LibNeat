@@ -21,7 +21,7 @@ namespace Neat::Win
 		Path& operator=(const Path& other);
 
 		Path& operator+=(const Path& other);
-		Path operator+(const Path& other);
+		Path operator+(const Path& other) const;
 
 		void Append(const wchar_t* path, size_t length = End);
 		void Append(const wchar_t t) = delete;

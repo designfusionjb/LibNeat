@@ -28,6 +28,24 @@ namespace Neat::Win
 
 		if (!file.m_handle.IsValid())
 			throw LastErrorException();
+
 		return file;
+	}
+
+	void File::Write(
+		LPCVOID lpBuffer,
+		DWORD nBytes,
+		LPOVERLAPPED lpOverlapped)
+	{
+		DWORD nWritten = 0;
+		auto success = ::WriteFile(
+			m_handle,
+			lpBuffer,
+			nBytes,
+			&nWritten,
+			lpOverlapped);
+
+		if (!success)
+			throw LastErrorException();
 	}
 }
