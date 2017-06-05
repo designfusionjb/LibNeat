@@ -87,6 +87,9 @@
     <ClInclude Include="Win\Environment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Uuid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -132,6 +135,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Win\Environment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Uuid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

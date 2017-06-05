@@ -92,6 +92,13 @@ namespace Neat::Convert
 		return result;
 	}
 
+	Utf8 ToUtf8(const Uuid& value)
+	{
+		Utf8 result;
+		result.Reserve(Uuid::LengthInHex());
+		return result;
+	}
+
 	//
 	// ToUtf16
 	//
@@ -177,6 +184,13 @@ namespace Neat::Convert
 			hex[1] = nibble(byte & 0xF);
 			result.Append(hex, 3);
 		}
+		return result;
+	}
+
+	Utf16 ToUtf16(const Uuid& value)
+	{
+		Utf16 result;
+		result.Reserve(Uuid::LengthInHex());
 		return result;
 	}
 

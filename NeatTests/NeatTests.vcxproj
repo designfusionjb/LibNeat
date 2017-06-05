@@ -155,6 +155,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ExceptionTest.cpp" />
+    <ClCompile Include="UuidTest.cpp" />
     <ClCompile Include="UtfTest.cpp" />
     <ClCompile Include="Win\ExceptionTest.cpp" />
     <ClCompile Include="Win\FunctionTest.cpp" />

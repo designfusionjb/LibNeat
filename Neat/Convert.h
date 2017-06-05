@@ -1,6 +1,7 @@
 #pragma once
 #include "Neat\Types.h"
 #include "Neat\Utf.h"
+#include "Neat\Uuid.h"
 
 #include <string>
 
@@ -23,6 +24,7 @@ namespace Neat::Convert
 	Utf8 ToUtf8(const uint64_t value);
 	Utf8 ToUtf8(const double value);
 	Utf8 ToUtf8(const IBuffer& value);
+	Utf8 ToUtf8(const Uuid& value);
 
 	//
 	// ToUtf16
@@ -41,6 +43,7 @@ namespace Neat::Convert
 	Utf16 ToUtf16(const uint64_t value);
 	Utf16 ToUtf16(const double value);
 	Utf16 ToUtf16(const IBuffer& value);
+	Utf16 ToUtf16(const Uuid& value);
 
 	//
 	// ToBuffer
