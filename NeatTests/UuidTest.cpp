@@ -21,7 +21,7 @@ namespace Neat
 			Uuid uuid;
 
 			Assert::AreEqual(16_sz, Uuid::SizeInBytes());
-			Assert::AreEqual(16_sz, uuid.GetSize());
+			Assert::AreEqual(16_sz, sizeof(uuid.m_raw));
 
 			for (auto word : uuid)
 				Assert::IsTrue(0 == word);
@@ -40,7 +40,7 @@ namespace Neat
 		{
 			// Version and variant check
 			{
-				auto uuid = Uuid::Generate();
+				auto uuid = UuidGenerator().Generate();
 				Assert::AreEqual<uint32_t>(4, uuid.GetVersion());
 				Assert::AreEqual<uint32_t>(0b10, uuid.GetVariant());
 			}
@@ -63,11 +63,14 @@ namespace Neat
 					duration);
 				Logger::WriteMessage(message);
 			}
+			UuidGenerator generator;
+			volatile auto accumulator = 0;
 			{
 				const auto start = steady_clock::now();
 				for (auto i = 0; i < count; i++)
 				{
-					volatile auto uuid = Uuid::Generate();
+					auto uuid = generator.Generate();
+					accumulator += uuid.GetVersion();
 				}
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();

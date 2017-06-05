@@ -1,25 +1,16 @@
 #pragma once
 #include "Neat\Types.h"
-#include "Neat\Buffer.h"
+
+#include <random>
 
 namespace Neat
 {
 	typedef uint8_t array6_t[6];
 
-	class Uuid : public Buffer
+	class Uuid
 	{
-		typedef Buffer Base;
-
 	public:
 		Uuid();
-		Uuid(Buffer&& other);
-		Uuid(const Buffer& other);
-
-		Uuid(Uuid&& other) = default;
-		Uuid(const Uuid& other) = default;
-
-		Uuid& operator=(Uuid&& other) = default;
-		Uuid& operator=(const Uuid& other) = default;
 
 		static constexpr size_t SizeInBytes();
 		static constexpr size_t LengthInHex();
@@ -27,7 +18,7 @@ namespace Neat
 		static constexpr uint16_t Version();
 		static constexpr uint16_t Variant();
 
-		static Uuid Generate();
+		//static Uuid Generate();
 
 		bool operator<(const Uuid& other);
 		bool operator<=(const Uuid& other);
@@ -53,7 +44,19 @@ namespace Neat
 
 		void SetVersion(uint16_t version);
 		void SetVariant(uint16_t variant);
+
+	private:
+		byte_t m_raw[16];
+
+		friend class UuidTest;
+		friend auto begin(Uuid& uuid);
+		friend auto end(Uuid& uuid);
 	};
+
+	inline Uuid::Uuid()
+	{
+		memset(m_raw, 0, sizeof(m_raw));
+	}
 
 	inline constexpr size_t Uuid::SizeInBytes()
 	{
@@ -77,12 +80,12 @@ namespace Neat
 
 	inline bool Uuid::operator<(const Uuid& other)
 	{
-		return memcmp(GetBuffer(), other.GetBuffer(), GetSize()) < 0;
+		return memcmp(m_raw, other.m_raw, sizeof(m_raw)) < 0;
 	}
 
 	inline bool Uuid::operator<=(const Uuid& other)
 	{
-		return memcmp(GetBuffer(), other.GetBuffer(), GetSize()) <= 0;
+		return memcmp(m_raw, other.m_raw, sizeof(m_raw)) <= 0;
 	}
 
 	inline bool Uuid::operator>(const Uuid& other)
@@ -97,7 +100,7 @@ namespace Neat
 
 	inline bool Uuid::operator==(const Uuid& other)
 	{
-		return 0 == memcmp(GetBuffer(), other.GetBuffer(), GetSize());
+		return 0 == memcmp(m_raw, other.m_raw, sizeof(m_raw));
 	}
 
 	inline bool Uuid::operator!=(const Uuid& other)
@@ -107,70 +110,60 @@ namespace Neat
 
 	inline uint32_t& Uuid::GetData1()
 	{
-		auto buffer = GetBuffer();
-		return *reinterpret_cast<uint32_t*>(buffer);
+		return *reinterpret_cast<uint32_t*>(m_raw);
 	}
 
 	inline uint16_t& Uuid::GetData2()
 	{
-		auto buffer = GetBuffer();
 		auto offset = sizeof(uint32_t);
-		return *reinterpret_cast<uint16_t*>(buffer + offset);
+		return *reinterpret_cast<uint16_t*>(m_raw + offset);
 	}
 
 	inline uint16_t& Uuid::GetData3()
 	{
-		auto buffer = GetBuffer();
 		auto offset = sizeof(uint32_t) + sizeof(uint16_t);
-		return *reinterpret_cast<uint16_t*>(buffer + offset);
+		return *reinterpret_cast<uint16_t*>(m_raw + offset);
 	}
 
 	inline uint16_t& Uuid::GetData4()
 	{
-		auto buffer = GetBuffer();
 		auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 2;
-		return *reinterpret_cast<uint16_t*>(buffer + offset);
+		return *reinterpret_cast<uint16_t*>(m_raw + offset);
 	}
 
 	inline array6_t& Uuid::GetData5()
 	{
-		auto buffer = GetBuffer();
 		auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 3;
-		return *reinterpret_cast<array6_t*>(buffer + offset);
+		return *reinterpret_cast<array6_t*>(m_raw + offset);
 	}
 
 	inline const uint32_t& Uuid::GetData1() const
 	{
-		const auto buffer = GetBuffer();
-		return *reinterpret_cast<const uint32_t*>(buffer);
+		return *reinterpret_cast<const uint32_t*>(m_raw);
 	}
 
 	inline const uint16_t& Uuid::GetData2() const
 	{
-		const auto buffer = GetBuffer();
 		const auto offset = sizeof(uint32_t);
-		return *reinterpret_cast<const uint16_t*>(buffer + offset);
+		return *reinterpret_cast<const uint16_t*>(m_raw + offset);
 	}
 
 	inline const uint16_t& Uuid::GetData3() const
 	{
-		const auto buffer = GetBuffer();
 		const auto offset = sizeof(uint32_t) + sizeof(uint16_t);
-		return *reinterpret_cast<const uint16_t*>(buffer + offset);
+		return *reinterpret_cast<const uint16_t*>(m_raw + offset);
 	}
 
 	inline const uint16_t& Uuid::GetData4() const
 	{
-		const auto buffer = GetBuffer();
 		const auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 2;
-		return *reinterpret_cast<const uint16_t*>(buffer + offset);
+		return *reinterpret_cast<const uint16_t*>(m_raw + offset);
 	}
 
 	inline const array6_t& Uuid::GetData5() const
 	{
-		const auto buffer = GetBuffer();
 		const auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 3;
-		return *reinterpret_cast<const array6_t*>(buffer + offset);
+		return *reinterpret_cast<const array6_t*>(m_raw + offset);
 	}
 
 	inline uint16_t Uuid::GetVersion() const
@@ -205,15 +198,29 @@ namespace Neat
 
 	inline auto begin(Uuid& uuid)
 	{
-		auto buffer = uuid.GetBuffer();
-		return reinterpret_cast<uint16_t*>(buffer);
+		return reinterpret_cast<uint32_t*>(uuid.m_raw);
 	}
 
 	inline auto end(Uuid& uuid)
 	{
-		auto buffer = uuid.GetBuffer();
-		auto size = uuid.GetSize();
-		return reinterpret_cast<uint16_t*>(buffer + size);
+		return reinterpret_cast<uint32_t*>(uuid.m_raw + sizeof(uuid.m_raw));
 	}
+
+	//
+	// Generator
+	//
+
+	class UuidGenerator
+	{
+	public:
+		UuidGenerator();
+
+		Uuid Generate();
+
+	private:
+		std::random_device m_randDevice;
+		std::default_random_engine m_randEngine;
+		std::uniform_int_distribution<uint32_t> m_uint32;
+	};
 }
 
