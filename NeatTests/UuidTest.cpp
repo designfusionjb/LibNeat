@@ -23,8 +23,8 @@ namespace Neat
 			Assert::AreEqual(16_sz, Uuid::SizeInBytes());
 			Assert::AreEqual(16_sz, sizeof(uuid.m_raw));
 
-			for (auto word : uuid)
-				Assert::IsTrue(0 == word);
+			for (auto dword : uuid)
+				Assert::IsTrue(0 == dword);
 
 			Assert::AreEqual<uint32_t>(0, uuid.GetVersion());
 			Assert::AreEqual<uint32_t>(0, uuid.GetVariant());
@@ -58,7 +58,7 @@ namespace Neat
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"%u ::CoCreateGuid calls took %Iu microseconds",
+					L"# %u ::CoCreateGuid calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);
@@ -75,11 +75,20 @@ namespace Neat
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"%u Uuid::Generate calls took %Iu microseconds",
+					L"# %u UuidGenerator calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);
 			}
+		}
+
+		TEST_METHOD(Uuid_Init)
+		{
+			Uuid uuid = { 0xa1, 0xeb, 0x53, 0xe9, 0xc8, 0xef, 0xf7, 0x45, 0x86, 0xdd, 0x01, 0xef, 0x20, 0x1f, 0xe2, 0x57, 0x00 };
+
+			size_t i = 0;
+			for (auto byte : { 0xa1, 0xeb, 0x53, 0xe9, 0xc8, 0xef, 0xf7, 0x45, 0x86, 0xdd, 0x01, 0xef, 0x20, 0x1f, 0xe2, 0x57 })
+				Assert::AreEqual<uint32_t>(byte, uuid.m_raw[i++]);
 		}
 	};
 }

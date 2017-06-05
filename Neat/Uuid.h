@@ -1,24 +1,25 @@
 #pragma once
 #include "Neat\Types.h"
 
+#include <initializer_list>
 #include <random>
 
 namespace Neat
 {
+	typedef uint8_t array2_t[2];
 	typedef uint8_t array6_t[6];
 
 	class Uuid
 	{
 	public:
 		Uuid();
+		Uuid(std::initializer_list<byte_t> list);
 
 		static constexpr size_t SizeInBytes();
 		static constexpr size_t LengthInHex();
 
 		static constexpr uint16_t Version();
 		static constexpr uint16_t Variant();
-
-		//static Uuid Generate();
 
 		bool operator<(const Uuid& other);
 		bool operator<=(const Uuid& other);
@@ -30,13 +31,13 @@ namespace Neat
 		uint32_t& GetData1();
 		uint16_t& GetData2();
 		uint16_t& GetData3();
-		uint16_t& GetData4();
+		array2_t& GetData4();
 		array6_t& GetData5();
 
 		const uint32_t& GetData1() const;
 		const uint16_t& GetData2() const;
 		const uint16_t& GetData3() const;
-		const uint16_t& GetData4() const;
+		const array2_t& GetData4() const;
 		const array6_t& GetData5() const;
 
 		uint16_t GetVersion() const;
@@ -125,10 +126,10 @@ namespace Neat
 		return *reinterpret_cast<uint16_t*>(m_raw + offset);
 	}
 
-	inline uint16_t& Uuid::GetData4()
+	inline array2_t& Uuid::GetData4()
 	{
 		auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 2;
-		return *reinterpret_cast<uint16_t*>(m_raw + offset);
+		return *reinterpret_cast<array2_t*>(m_raw + offset);
 	}
 
 	inline array6_t& Uuid::GetData5()
@@ -154,10 +155,10 @@ namespace Neat
 		return *reinterpret_cast<const uint16_t*>(m_raw + offset);
 	}
 
-	inline const uint16_t& Uuid::GetData4() const
+	inline const array2_t& Uuid::GetData4() const
 	{
 		const auto offset = sizeof(uint32_t) + sizeof(uint16_t) * 2;
-		return *reinterpret_cast<const uint16_t*>(m_raw + offset);
+		return *reinterpret_cast<const array2_t*>(m_raw + offset);
 	}
 
 	inline const array6_t& Uuid::GetData5() const
@@ -176,7 +177,7 @@ namespace Neat
 	inline uint16_t Uuid::GetVariant() const
 	{
 		const auto data4 = GetData4();
-		uint16_t variant = (data4 >> 14) & 0x3;
+		uint16_t variant = (data4[0] >> 6) & 0x3;
 		return static_cast<uint16_t>(variant);
 	}
 
@@ -191,9 +192,9 @@ namespace Neat
 	inline void Uuid::SetVariant(uint16_t variant)
 	{
 		auto& data4 = GetData4();
-		uint16_t mask = variant << 14;
-		data4 &= 0x3FFF;
-		data4 |= mask;
+		uint16_t mask = variant << 6;
+		data4[0] &= 0x3F;
+		data4[0] |= mask;
 	}
 
 	inline auto begin(Uuid& uuid)

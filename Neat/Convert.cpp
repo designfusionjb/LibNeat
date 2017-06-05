@@ -5,6 +5,105 @@
 namespace Neat::Convert
 {
 	//
+	// ToHex
+	//
+
+	char ToHex(byte_t value, Base base)
+	{
+		const auto hex = [=]()
+		{
+			switch (base)
+			{
+			case Base::Hex:
+				return 'a';
+			case Base::HexUp:
+				return 'A';
+			default:
+				throw std::runtime_error("Not implemented");
+			}
+		}();
+		if (value < 10)
+			return '0' + value;
+		value -= 10;
+		return hex + value;
+	}
+
+	void ToHex(char* buffer, byte_t value, Base base)
+	{
+		buffer[0] = ToHex(value >> 4, base);
+		buffer[1] = ToHex(value & 0xF, base);
+	}
+
+	void ToHex(wchar_t* buffer, byte_t value, Base base)
+	{
+		buffer[0] = ToHex(value >> 4, base);
+		buffer[1] = ToHex(value & 0xF, base);
+	}
+
+	//
+	// ToNibble
+	//
+
+	byte_t ToNibble(char c)
+	{
+		switch (c)
+		{
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			return static_cast<byte_t>(c - '0');
+		case 'a':
+		case 'b':
+		case 'c':
+		case 'd':
+		case 'e':
+		case 'f':
+			return static_cast<byte_t>(c - 'a' + 10);
+		case 'A':
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'E':
+		case 'F':
+			return static_cast<byte_t>(c - 'A' + 10);
+		default:
+			throw std::runtime_error("Not a hex!");
+		}
+	}
+
+	byte_t ToNibble(wchar_t c)
+	{
+		return ToNibble(static_cast<char>(c));
+	}
+
+	//
+	// ToByte
+	//
+
+	byte_t ToByte(char hi, char lo)
+	{
+		byte_t byte = ToNibble(hi);
+		byte <<= 4;
+		byte |= ToNibble(lo);
+		return byte;
+	}
+
+	byte_t ToByte(wchar_t hi, wchar_t lo)
+	{
+		byte_t byte = ToNibble(static_cast<char>(hi));
+		byte <<= 4;
+		byte |= ToNibble(static_cast<char>(lo));
+		return byte;
+	}
+
+	//
 	// ToUtf8
 	//
 
@@ -50,14 +149,73 @@ namespace Neat::Convert
 		return Utf8::Format("%lli", value);
 	}
 
-	Utf8 ToUtf8(const uint32_t value)
+	Utf8 ToUtf8(const uint8_t value, Base base)
 	{
-		return Utf8::Format("%u", value);
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf8::Format("%u", value);
+		}
+
+		Utf8 result;
+		result.Reserve(2);
+		result[0] = ToHex(value >> 4, base);
+		result[1] = ToHex(value & 0xF, base);
+		return result;
 	}
 
-	Utf8 ToUtf8(const uint64_t value)
+	Utf8 ToUtf8(const uint16_t value, Base base)
 	{
-		return Utf8::Format("%llu", value);
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf8::Format("%hu", value);
+
+		case Base::Hex:
+			return Utf8::Format("%04hx", value);
+
+		case Base::HexUp:
+			return Utf8::Format("%04hX", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
+	}
+
+	Utf8 ToUtf8(const uint32_t value, Base base)
+	{
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf8::Format("%u", value);
+
+		case Base::Hex:
+			return Utf8::Format("%08x", value);
+
+		case Base::HexUp:
+			return Utf8::Format("%08X", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
+	}
+
+	Utf8 ToUtf8(const uint64_t value, Base base)
+	{
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf8::Format("%llu", value);
+
+		case Base::Hex:
+			return Utf8::Format("%016llx", value);
+
+		case Base::HexUp:
+			return Utf8::Format("%016llX", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
 	}
 
 	Utf8 ToUtf8(const double value)
@@ -65,37 +223,69 @@ namespace Neat::Convert
 		return Utf8::Format("%f", value);
 	}
 
-	Utf8 ToUtf8(const IBuffer& value)
+	Utf8 ToUtf8(const IBuffer& value, Base base)
 	{
-		auto nibble = [](byte_t n)
-		{
-			if (n < 10)
-				return '0' + n;
-			n -= 10;
-			return 'A' + n;
-		};
-
 		const auto buffer = value.GetBuffer();
 		const auto size = value.GetSize();
 
 		Utf8 result;
 		result.Reserve(size * 2);
-
-		char hex[3] = {0};
 		for (size_t i = 0; i < size; i++)
 		{
 			const auto byte = buffer[i];
-			hex[0] = nibble(byte >> 4);
-			hex[1] = nibble(byte & 0xF);
-			result.Append(hex, 3);
+			result[i * 2] = ToHex(byte >> 4, base);
+			result[i * 2 + 1] = ToHex(byte & 0xF, base);
 		}
 		return result;
 	}
 
-	Utf8 ToUtf8(const Uuid& value)
+	Utf8 ToUtf8(const Uuid& value, Base base)
 	{
+		switch (base)
+		{
+		case Base::Dec:
+			throw std::runtime_error("Not implemented");
+		}
+
 		Utf8 result;
 		result.Reserve(Uuid::LengthInHex());
+
+		{
+			const auto& data1 = value.GetData1();
+			result.Append(ToUtf8(data1, base));
+			result.Append('-');
+		}
+		{
+			const auto& data2 = value.GetData2();
+			result.Append(ToUtf8(data2, base));
+			result.Append('-');
+		}
+		{
+			const auto& data3 = value.GetData3();
+			result.Append(ToUtf8(data3, base));
+			result.Append('-');
+		}
+		{
+			size_t i = 19;
+			const auto& data4 = value.GetData4();
+			for (auto byte : data4)
+			{
+				ToHex(result + i, byte, base);
+				i += 2;
+			}
+			result[i] = '-';
+		}
+		{
+			size_t i = 24;
+			const auto& data5 = value.GetData5();
+			for (auto byte : data5)
+			{
+				ToHex(result + i, byte, base);
+				i += 2;
+			}
+			result[i] = '\0';
+		}
+
 		return result;
 	}
 
@@ -145,14 +335,73 @@ namespace Neat::Convert
 		return Utf16::Format(L"%lli", value);
 	}
 
-	Utf16 ToUtf16(const uint32_t value)
+	Utf16 ToUtf16(const uint8_t value, Base base)
 	{
-		return Utf16::Format(L"%u", value);
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf16::Format(L"%u", value);
+		}
+
+		Utf16 result;
+		result.Reserve(2);
+		result[0] = ToHex(value >> 4, base);
+		result[1] = ToHex(value & 0xF, base);
+		return result;
+	}
+	
+	Utf16 ToUtf16(const uint16_t value, Base base)
+	{
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf16::Format(L"%hu", value);
+
+		case Base::Hex:
+			return Utf16::Format(L"%04hx", value);
+
+		case Base::HexUp:
+			return Utf16::Format(L"%04hX", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
 	}
 
-	Utf16 ToUtf16(const uint64_t value)
+	Utf16 ToUtf16(const uint32_t value, Base base)
 	{
-		return Utf16::Format(L"%llu", value);
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf16::Format(L"%u", value);
+
+		case Base::Hex:
+			return Utf16::Format(L"%08x", value);
+
+		case Base::HexUp:
+			return Utf16::Format(L"%08X", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
+	}
+
+	Utf16 ToUtf16(const uint64_t value, Base base)
+	{
+		switch (base)
+		{
+		case Base::Dec:
+			return Utf16::Format(L"%llu", value);
+
+		case Base::Hex:
+			return Utf16::Format(L"%016llx", value);
+
+		case Base::HexUp:
+			return Utf16::Format(L"%016llX", value);
+
+		default:
+			throw std::runtime_error("Not implemented");
+		}
 	}
 
 	Utf16 ToUtf16(const double value)
@@ -160,37 +409,69 @@ namespace Neat::Convert
 		return Utf16::Format(L"%f", value);
 	}
 
-	Utf16 ToUtf16(const IBuffer& value)
+	Utf16 ToUtf16(const IBuffer& value, Base base)
 	{
-		auto nibble = [](byte_t n)
-		{
-			if (n < 10)
-				return L'0' + n;
-			n -= 10;
-			return L'A' + n;
-		};
-
 		const auto buffer = value.GetBuffer();
 		const auto size = value.GetSize();
 
 		Utf16 result;
 		result.Reserve(size * 2);
-
-		wchar_t hex[3] = { 0 };
 		for (size_t i = 0; i < size; i++)
 		{
 			const auto byte = buffer[i];
-			hex[0] = nibble(byte >> 4);
-			hex[1] = nibble(byte & 0xF);
-			result.Append(hex, 3);
+			result[i * 2] = ToHex(byte >> 4, base);
+			result[i * 2 + 1] = ToHex(byte & 0xF, base);
 		}
 		return result;
 	}
 
-	Utf16 ToUtf16(const Uuid& value)
+	Utf16 ToUtf16(const Uuid& value, Base base)
 	{
+		switch (base)
+		{
+		case Base::Dec:
+			throw std::runtime_error("Not implemented");
+		}
+
 		Utf16 result;
 		result.Reserve(Uuid::LengthInHex());
+
+		{
+			const auto& data1 = value.GetData1();
+			result.Append(ToUtf16(data1, base));
+			result.Append('-');
+		}
+		{
+			const auto& data2 = value.GetData2();
+			result.Append(ToUtf16(data2, base));
+			result.Append('-');
+		}
+		{
+			const auto& data3 = value.GetData3();
+			result.Append(ToUtf16(data3, base));
+			result.Append('-');
+		}
+		{
+			size_t i = 19;
+			const auto& data4 = value.GetData4();
+			for (auto byte : data4)
+			{
+				ToHex(result + i, byte, base);
+				i += 2;
+			}
+			result[i] = '-';
+		}
+		{
+			size_t i = 24;
+			const auto& data5 = value.GetData5();
+			for (auto byte : data5)
+			{
+				ToHex(result + i, byte, base);
+				i += 2;
+			}
+			result[i] = '\0';
+		}
+
 		return result;
 	}
 
@@ -200,101 +481,39 @@ namespace Neat::Convert
 
 	Buffer ToBuffer(const char* value)
 	{
-		auto nibble = [](char c)
-		{
-			switch (c)
-			{
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				return static_cast<byte_t>(c - '0');
-			case 'a':
-			case 'b':
-			case 'c':
-			case 'd':
-			case 'e':
-			case 'f':
-				return static_cast<byte_t>(c - 'a' + 10);
-			case 'A':
-			case 'B':
-			case 'C':
-			case 'D':
-			case 'E':
-			case 'F':
-				return static_cast<byte_t>(c - 'A' + 10);
-			default:
-				throw std::runtime_error("Not a hex!");
-			}
-		};
-
 		const auto size = Utf8::GetLength(value) / 2;
 
 		Buffer buffer(size);
 		for (size_t i = 0; i < size; i++)
-		{
-			byte_t byte = nibble(value[i * 2]);
-			byte <<= 4;
-			byte |= nibble(value[i * 2 + 1]);
-			buffer[i] = byte;
-		}
+			buffer[i] = ToByte(value[i * 2], value[i * 2 + 1]);
 
 		return buffer;
 	}
 
 	Buffer ToBuffer(const wchar_t* value)
 	{
-		auto nibble = [](wchar_t c)
-		{
-			switch (c)
-			{
-			case L'0':
-			case L'1':
-			case L'2':
-			case L'3':
-			case L'4':
-			case L'5':
-			case L'6':
-			case L'7':
-			case L'8':
-			case L'9':
-				return static_cast<byte_t>(c - L'0');
-			case L'a':
-			case L'b':
-			case L'c':
-			case L'd':
-			case L'e':
-			case L'f':
-				return static_cast<byte_t>(c - L'a' + 10);
-			case L'A':
-			case L'B':
-			case L'C':
-			case L'D':
-			case L'E':
-			case L'F':
-				return static_cast<byte_t>(c - L'A' + 10);
-			default:
-				throw std::runtime_error("Not a hex!");
-			}
-		};
-
 		const auto size = Utf16::GetLength(value) / 2;
 
 		Buffer buffer(size);
 		for (size_t i = 0; i < size; i++)
-		{
-			byte_t byte = nibble(value[i * 2]);
-			byte <<= 4;
-			byte |= nibble(value[i * 2 + 1]);
-			buffer[i] = byte;
-		}
+			buffer[i] = ToByte(value[i * 2], value[i * 2 + 1]);
 
 		return buffer;
+	}
+
+	//
+	// ToUuid
+	//
+
+	Uuid ToUuid(const char* value)
+	{
+		Uuid uuid;
+		return uuid;
+	}
+
+	Uuid ToUuid(const wchar_t* value)
+	{
+		Uuid uuid;
+		return uuid;
 	}
 }

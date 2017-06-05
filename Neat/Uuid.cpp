@@ -2,6 +2,18 @@
 
 namespace Neat
 {
+	Uuid::Uuid(std::initializer_list<byte_t> list) :
+		Uuid()
+	{
+		size_t i = 0;
+		for (auto byte : list)
+		{
+			m_raw[i++] = byte;
+			if (i >= Uuid::SizeInBytes())
+				break;
+		}
+	}
+
 	UuidGenerator::UuidGenerator() :
 		m_randEngine(m_randDevice())
 	{
