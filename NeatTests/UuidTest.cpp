@@ -46,40 +46,42 @@ namespace Neat
 			}
 
 			// Perfomance comparison with ::CoCreateGuid
+
 			using namespace std::chrono;
 			const auto count = 100;
 			{
+				GUID guid;
+
 				const auto start = steady_clock::now();
 				for (auto i = 0; i < count; i++)
 				{
-					GUID guid;
 					::CoCreateGuid(&guid);
 				}
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"# %u ::CoCreateGuid calls took %llu microseconds",
+					L"# %u ::CoCreateGuid() calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);
 			}
-			UuidGenerator generator;
-			volatile auto accumulator = 0;
 			{
+				UuidGenerator generator;
+
 				const auto start = steady_clock::now();
 				for (auto i = 0; i < count; i++)
 				{
-					auto uuid = generator.Generate();
-					accumulator += uuid.GetVersion();
+					volatile auto uuid = generator.Generate();
 				}
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"# %u UuidGenerator calls took %llu microseconds",
+					L"# %u UuidGenerator::Generate() calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);
 			}
+			Logger::WriteMessage(L"#");
 		}
 
 		TEST_METHOD(Uuid_Init)

@@ -479,9 +479,10 @@ namespace Neat::Convert
 	// ToBuffer
 	//
 
-	Buffer ToBuffer(const char* value)
+	template <typename T>
+	Buffer ToBufferT(const T* value)
 	{
-		const auto size = Utf8::GetLength(value) / 2;
+		const auto size = StringT<T>::GetLength(value) / 2;
 
 		Buffer buffer(size);
 		for (size_t i = 0; i < size; i++)
@@ -490,30 +491,95 @@ namespace Neat::Convert
 		return buffer;
 	}
 
+	Buffer ToBuffer(const char* value)
+	{
+		return ToBufferT(value);
+	}
+
 	Buffer ToBuffer(const wchar_t* value)
 	{
-		const auto size = Utf16::GetLength(value) / 2;
-
-		Buffer buffer(size);
-		for (size_t i = 0; i < size; i++)
-			buffer[i] = ToByte(value[i * 2], value[i * 2 + 1]);
-
-		return buffer;
+		return ToBufferT(value);
 	}
 
 	//
 	// ToUuid
 	//
 
+	template <typename T>
+	Uuid ToUuidT(const T* value)
+	{
+		if (!value)
+			throw std::exception();
+
+		const auto length = StringT<T>::GetLength(value);
+		if (length < Uuid::LengthInHex())
+			throw std::exception();
+
+		Uuid uuid;
+		{
+			auto& data1 = uuid.GetData1();
+			for (auto j = 0; j < sizeof(data1); j++)
+			{
+				data1 <<= 4;
+				data1 |= ToNibble(*value++);
+				data1 <<= 4;
+				data1 |= ToNibble(*value++);
+			}
+		}
+		value++; // skip '-'
+		{
+			auto& data2 = uuid.GetData2();
+			for (auto j = 0; j < sizeof(data2); j++)
+			{
+				data2 <<= 4;
+				data2 |= ToNibble(*value++);
+				data2 <<= 4;
+				data2 |= ToNibble(*value++);
+			}
+		}
+		value++; // skip '-'
+		{
+			auto& data3 = uuid.GetData3();
+			for (auto j = 0; j < sizeof(data3); j++)
+			{
+				data3 <<= 4;
+				data3 |= ToNibble(*value++);
+				data3 <<= 4;
+				data3 |= ToNibble(*value++);
+			}
+		}
+		value++; // skip '-'
+		{
+			auto& data4 = uuid.GetData4();
+			for (auto j = 0; j < sizeof(data4); j++)
+			{
+				data4[j] <<= 4;
+				data4[j] |= ToNibble(*value++);
+				data4[j] <<= 4;
+				data4[j] |= ToNibble(*value++);
+			}
+		}
+		value++; // skip '-'
+		{
+			auto& data5 = uuid.GetData5();
+			for (auto j = 0; j < sizeof(data5); j++)
+			{
+				data5[j] <<= 4;
+				data5[j] |= ToNibble(*value++);
+				data5[j] <<= 4;
+				data5[j] |= ToNibble(*value++);
+			}
+		}
+		return uuid;
+	}
+
 	Uuid ToUuid(const char* value)
 	{
-		Uuid uuid;
-		return uuid;
+		return ToUuidT(value);
 	}
 
 	Uuid ToUuid(const wchar_t* value)
 	{
-		Uuid uuid;
-		return uuid;
+		return ToUuidT(value);
 	}
 }

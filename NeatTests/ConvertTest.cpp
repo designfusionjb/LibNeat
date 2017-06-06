@@ -4,6 +4,8 @@
 #include <chrono>
 
 #include <CppUnitTest.h>
+#include <objbase.h>
+#pragma comment(lib, "Ole32.lib")
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -159,6 +161,7 @@ namespace Neat
 					duration);
 				Logger::WriteMessage(message);
 			}
+			Logger::WriteMessage(L"#");
 		}
 
 		TEST_METHOD(Convert_BufferToString)
@@ -283,6 +286,8 @@ namespace Neat
 
 		TEST_METHOD(Convert_UuidToString)
 		{
+			// Sanity check
+
 			Uuid uuid = { 0xa1, 0xeb, 0x53, 0xe9, 0xc8, 0xef, 0xf7, 0x45, 0x86, 0xdd, 0x01, 0xef, 0x20, 0x1f, 0xe2, 0x57 };
 
 			Assert::AreEqual("e953eba1-efc8-45f7-86dd-01ef201fe257", Convert::ToUtf8(uuid, Convert::Base::Hex));
@@ -290,10 +295,117 @@ namespace Neat
 
 			Assert::AreEqual(L"e953eba1-efc8-45f7-86dd-01ef201fe257", Convert::ToUtf16(uuid, Convert::Base::Hex));
 			Assert::AreEqual(L"E953EBA1-EFC8-45F7-86DD-01EF201FE257", Convert::ToUtf16(uuid, Convert::Base::HexUp));
+
+			// Perfomance comparison
+
+			using namespace std::chrono;
+			const auto count = 100;
+			{
+				const auto size = 39_sz;
+				wchar_t utf16[size] = { 0 };
+
+				GUID guid = { 0xE953EBA1, 0xEFC8, 0x45F7, { 0x86, 0xDD, 0x01, 0xEF, 0x20, 0x1F, 0xE2, 0x57 } };
+
+				const auto start = steady_clock::now();
+				for (auto i = 0; i < count; i++)
+				{
+					::StringFromGUID2(guid, utf16, size);
+				}
+				const auto end = steady_clock::now();
+				const auto duration = duration_cast<microseconds>(end - start).count();
+				const auto message = Utf16::Format(
+					L"# %u ::StringFromGUID2() calls took %llu microseconds",
+					count,
+					duration);
+				Logger::WriteMessage(message);
+			}
+			{
+				Uuid uuid = { 0xA1, 0xEB, 0x53, 0xE9, 0xC8, 0xEF, 0xF7, 0x45, 0x86, 0xDD, 0x01, 0xEF, 0x20, 0x1F, 0xE2, 0x57 };
+
+				const auto start = steady_clock::now();
+				for (auto i = 0; i < count; i++)
+				{
+					volatile auto utf16 = Convert::ToUtf16(uuid);
+				}
+				const auto end = steady_clock::now();
+				const auto duration = duration_cast<microseconds>(end - start).count();
+				const auto message = Utf16::Format(
+					L"# %u Convert::ToUtf16() calls took %llu microseconds",
+					count,
+					duration);
+				Logger::WriteMessage(message);
+			}
+			Logger::WriteMessage(L"#");
 		}
 
 		TEST_METHOD(Convert_StringToUuid)
 		{
+			// Sanity check
+			{
+				Assert::ExpectException<std::exception>([]()
+				{
+					Convert::ToUuid(static_cast<const char*>(nullptr));
+				});
+
+				Assert::ExpectException<std::exception>([]()
+				{
+					Convert::ToUuid(static_cast<const wchar_t*>(nullptr));
+				});
+
+				Assert::ExpectException<std::exception>([]()
+				{
+					Convert::ToUuid("");
+				});
+
+				Assert::ExpectException<std::exception>([]()
+				{
+					Convert::ToUuid(L"");
+				});
+
+				Uuid uuid = { 0xA1, 0xEB, 0x53, 0xE9, 0xC8, 0xEF, 0xF7, 0x45, 0x86, 0xDD, 0x01, 0xEF, 0x20, 0x1F, 0xE2, 0x57 };
+				Assert::IsTrue(uuid == Convert::ToUuid("e953eba1-efc8-45f7-86dd-01ef201fe257"));
+				Assert::IsTrue(uuid == Convert::ToUuid("E953EBA1-EFC8-45F7-86DD-01EF201FE257"));
+				Assert::IsTrue(uuid == Convert::ToUuid(L"e953eba1-efc8-45f7-86dd-01ef201fe257"));
+				Assert::IsTrue(uuid == Convert::ToUuid(L"E953EBA1-EFC8-45F7-86DD-01EF201FE257"));
+			}
+
+			// Perfomance comparison
+
+			using namespace std::chrono;
+			const auto count = 100;
+			{
+				GUID guid;
+				const auto string = L"{E953EBA1-EFC8-45F7-86DD-01EF201FE257}";
+
+				const auto start = steady_clock::now();
+				for (auto i = 0; i < count; i++)
+				{
+					::IIDFromString(string, &guid);
+				}
+				const auto end = steady_clock::now();
+				const auto duration = duration_cast<microseconds>(end - start).count();
+				const auto message = Utf16::Format(
+					L"# %u ::IIDFromString() calls took %llu microseconds",
+					count,
+					duration);
+				Logger::WriteMessage(message);
+			}
+			{
+				const auto string = L"E953EBA1-EFC8-45F7-86DD-01EF201FE257";
+				const auto start = steady_clock::now();
+				for (auto i = 0; i < count; i++)
+				{
+					volatile auto uuid = Convert::ToUuid(string);
+				}
+				const auto end = steady_clock::now();
+				const auto duration = duration_cast<microseconds>(end - start).count();
+				const auto message = Utf16::Format(
+					L"# %u Convert::ToUuid() calls took %llu microseconds",
+					count,
+					duration);
+				Logger::WriteMessage(message);
+			}
+			Logger::WriteMessage(L"#");
 		}
 	};
 }
