@@ -112,13 +112,13 @@ namespace Neat
 			// Perfomance comparison
 
 			using namespace std::chrono;
-			const auto count = 100;
+			const auto count = 100u;
 			{
 				char utf8[21] = { 0 };
 				wchar_t utf16[21] = { 0 };
 
 				const auto start = steady_clock::now();
-				for (auto i = 0; i < count; i++)
+				for (auto i = 0u; i < count; i++)
 				{
 					::_itoa_s(i, utf8, 10);
 					::_itow_s(i, utf16, 10);
@@ -133,7 +133,7 @@ namespace Neat
 			}
 			{
 				const auto start = steady_clock::now();
-				for (auto i = 0; i < count; i++)
+				for (auto i = 0u; i < count; i++)
 				{
 					volatile auto utf8 = Convert::ToUtf8(i);
 					volatile auto utf16 = Convert::ToUtf16(i);
@@ -141,22 +141,22 @@ namespace Neat
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"# %u ToUtf8/ToUtf16 calls took %llu microseconds",
+					L"# %u convert to Dec calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);
 			}
 			{
 				const auto start = steady_clock::now();
-				for (auto i = 0; i < count; i++)
+				for (auto i = 0u; i < count; i++)
 				{
-					volatile auto utf8 = Convert::ToUtf8((uint8_t)i, Convert::Base::HexUp);
-					volatile auto utf16 = Convert::ToUtf16((uint8_t)i, Convert::Base::HexUp);
+					volatile auto utf8 = Convert::ToUtf8(i, Convert::Base::HexUp);
+					volatile auto utf16 = Convert::ToUtf16(i, Convert::Base::HexUp);
 				}
 				const auto end = steady_clock::now();
 				const auto duration = duration_cast<microseconds>(end - start).count();
 				const auto message = Utf16::Format(
-					L"# %u convert to hex calls took %llu microseconds",
+					L"# %u convert to Hex calls took %llu microseconds",
 					count,
 					duration);
 				Logger::WriteMessage(message);

@@ -90,6 +90,9 @@ namespace Neat
 		Base::GetAllocator;
 		Base::GetBuffer;
 		Base::GetSize;
+
+		const T* GetString() const;
+		T* GetString();
 		
 		bool IsEmpty() const;
 		bool IsEqual(const T* string) const;
@@ -207,6 +210,18 @@ namespace Neat
 	StringT<T, Traits>::StringT(StringT&& other)
 	{
 		MoveFrom(other);
+	}
+
+	template <typename T, typename Traits>
+	const T* StringT<T, Traits>::GetString() const
+	{
+		return m_buffer;
+	}
+
+	template <typename T, typename Traits>
+	T* StringT<T, Traits>::GetString()
+	{
+		return m_buffer;
 	}
 
 	template <typename T, typename Traits>

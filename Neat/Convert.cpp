@@ -28,16 +28,32 @@ namespace Neat::Convert
 		return hex + value;
 	}
 
-	void ToHex(char* buffer, byte_t value, Base base)
+	template <typename T>
+	void ToHex(T* buffer, uint8_t value, Base base)
 	{
 		buffer[0] = ToHex(value >> 4, base);
 		buffer[1] = ToHex(value & 0xF, base);
 	}
 
-	void ToHex(wchar_t* buffer, byte_t value, Base base)
+	template <typename T>
+	void ToHex(T* buffer, uint16_t value, Base base)
 	{
-		buffer[0] = ToHex(value >> 4, base);
-		buffer[1] = ToHex(value & 0xF, base);
+		ToHex(buffer, uint8_t((value >> 8) & 0xFF), base);
+		ToHex(buffer + 2, uint8_t(value & 0xFF), base);
+	}
+
+	template <typename T>
+	void ToHex(T* buffer, uint32_t value, Base base)
+	{
+		ToHex(buffer, uint16_t((value >> 16) & 0xFFFF), base);
+		ToHex(buffer + 4, uint16_t(value & 0xFFFF), base);
+	}
+
+	template <typename T>
+	void ToHex(T* buffer, uint64_t value, Base base)
+	{
+		ToHex(buffer, uint32_t((value >> 32) & 0xFFFFFFFF), base);
+		ToHex(buffer + 8, uint32_t(value & 0xFFFFFFFF), base);
 	}
 
 	//
@@ -159,8 +175,7 @@ namespace Neat::Convert
 
 		Utf8 result;
 		result.Reserve(2);
-		result[0] = ToHex(value >> 4, base);
-		result[1] = ToHex(value & 0xF, base);
+		ToHex(result.GetString(), value, base);
 		return result;
 	}
 
@@ -170,16 +185,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf8::Format("%hu", value);
-
-		case Base::Hex:
-			return Utf8::Format("%04hx", value);
-
-		case Base::HexUp:
-			return Utf8::Format("%04hX", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf8 result;
+		result.Reserve(4);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf8 ToUtf8(const uint32_t value, Base base)
@@ -188,16 +199,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf8::Format("%u", value);
-
-		case Base::Hex:
-			return Utf8::Format("%08x", value);
-
-		case Base::HexUp:
-			return Utf8::Format("%08X", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf8 result;
+		result.Reserve(8);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf8 ToUtf8(const uint64_t value, Base base)
@@ -206,16 +213,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf8::Format("%llu", value);
-
-		case Base::Hex:
-			return Utf8::Format("%016llx", value);
-
-		case Base::HexUp:
-			return Utf8::Format("%016llX", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf8 result;
+		result.Reserve(16);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf8 ToUtf8(const double value)
@@ -231,11 +234,8 @@ namespace Neat::Convert
 		Utf8 result;
 		result.Reserve(size * 2);
 		for (size_t i = 0; i < size; i++)
-		{
-			const auto byte = buffer[i];
-			result[i * 2] = ToHex(byte >> 4, base);
-			result[i * 2 + 1] = ToHex(byte & 0xF, base);
-		}
+			ToHex(result + i * 2, buffer[i], base);
+
 		return result;
 	}
 
@@ -247,44 +247,29 @@ namespace Neat::Convert
 			throw std::runtime_error("Not implemented");
 		}
 
-		Utf8 result;
-		result.Reserve(Uuid::LengthInHex());
+		Utf8 result = "00000000-0000-0000-0000-000000000000";
+		auto buffer = result.GetString();
 
-		{
-			const auto& data1 = value.GetData1();
-			result.Append(ToUtf8(data1, base));
-			result.Append('-');
-		}
-		{
-			const auto& data2 = value.GetData2();
-			result.Append(ToUtf8(data2, base));
-			result.Append('-');
-		}
-		{
-			const auto& data3 = value.GetData3();
-			result.Append(ToUtf8(data3, base));
-			result.Append('-');
-		}
-		{
-			size_t i = 19;
-			const auto& data4 = value.GetData4();
-			for (auto byte : data4)
-			{
-				ToHex(result + i, byte, base);
-				i += 2;
-			}
-			result[i] = '-';
-		}
-		{
-			size_t i = 24;
-			const auto& data5 = value.GetData5();
-			for (auto byte : data5)
-			{
-				ToHex(result + i, byte, base);
-				i += 2;
-			}
-			result[i] = '\0';
-		}
+		const auto& data1 = value.GetData1();
+		ToHex(buffer, data1, base);
+
+		const auto& data2 = value.GetData2();
+		ToHex(buffer + 9, data2, base);
+
+		const auto& data3 = value.GetData3();
+		ToHex(buffer + 14, data3, base);
+
+		const auto& data4 = value.GetData4();
+		ToHex(buffer + 19, data4[0], base);
+		ToHex(buffer + 21, data4[1], base);
+
+		const auto& data5 = value.GetData5();
+		ToHex(buffer + 24, data5[0], base);
+		ToHex(buffer + 26, data5[1], base);
+		ToHex(buffer + 28, data5[2], base);
+		ToHex(buffer + 30, data5[3], base);
+		ToHex(buffer + 32, data5[4], base);
+		ToHex(buffer + 34, data5[5], base);
 
 		return result;
 	}
@@ -345,8 +330,7 @@ namespace Neat::Convert
 
 		Utf16 result;
 		result.Reserve(2);
-		result[0] = ToHex(value >> 4, base);
-		result[1] = ToHex(value & 0xF, base);
+		ToHex(result.GetString(), value, base);
 		return result;
 	}
 	
@@ -356,16 +340,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf16::Format(L"%hu", value);
-
-		case Base::Hex:
-			return Utf16::Format(L"%04hx", value);
-
-		case Base::HexUp:
-			return Utf16::Format(L"%04hX", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf16 result;
+		result.Reserve(4);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf16 ToUtf16(const uint32_t value, Base base)
@@ -374,16 +354,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf16::Format(L"%u", value);
-
-		case Base::Hex:
-			return Utf16::Format(L"%08x", value);
-
-		case Base::HexUp:
-			return Utf16::Format(L"%08X", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf16 result;
+		result.Reserve(8);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf16 ToUtf16(const uint64_t value, Base base)
@@ -392,16 +368,12 @@ namespace Neat::Convert
 		{
 		case Base::Dec:
 			return Utf16::Format(L"%llu", value);
-
-		case Base::Hex:
-			return Utf16::Format(L"%016llx", value);
-
-		case Base::HexUp:
-			return Utf16::Format(L"%016llX", value);
-
-		default:
-			throw std::runtime_error("Not implemented");
 		}
+
+		Utf16 result;
+		result.Reserve(16);
+		ToHex(result.GetString(), value, base);
+		return result;
 	}
 
 	Utf16 ToUtf16(const double value)
@@ -417,11 +389,8 @@ namespace Neat::Convert
 		Utf16 result;
 		result.Reserve(size * 2);
 		for (size_t i = 0; i < size; i++)
-		{
-			const auto byte = buffer[i];
-			result[i * 2] = ToHex(byte >> 4, base);
-			result[i * 2 + 1] = ToHex(byte & 0xF, base);
-		}
+			ToHex(result + i * 2, buffer[i], base);
+
 		return result;
 	}
 
@@ -433,44 +402,29 @@ namespace Neat::Convert
 			throw std::runtime_error("Not implemented");
 		}
 
-		Utf16 result;
-		result.Reserve(Uuid::LengthInHex());
+		Utf16 result = L"00000000-0000-0000-0000-000000000000";
+		auto buffer = result.GetString();
 
-		{
-			const auto& data1 = value.GetData1();
-			result.Append(ToUtf16(data1, base));
-			result.Append('-');
-		}
-		{
-			const auto& data2 = value.GetData2();
-			result.Append(ToUtf16(data2, base));
-			result.Append('-');
-		}
-		{
-			const auto& data3 = value.GetData3();
-			result.Append(ToUtf16(data3, base));
-			result.Append('-');
-		}
-		{
-			size_t i = 19;
-			const auto& data4 = value.GetData4();
-			for (auto byte : data4)
-			{
-				ToHex(result + i, byte, base);
-				i += 2;
-			}
-			result[i] = '-';
-		}
-		{
-			size_t i = 24;
-			const auto& data5 = value.GetData5();
-			for (auto byte : data5)
-			{
-				ToHex(result + i, byte, base);
-				i += 2;
-			}
-			result[i] = '\0';
-		}
+		const auto& data1 = value.GetData1();
+		ToHex(buffer, data1, base);
+
+		const auto& data2 = value.GetData2();
+		ToHex(buffer + 9, data2, base);
+
+		const auto& data3 = value.GetData3();
+		ToHex(buffer + 14, data3, base);
+
+		const auto& data4 = value.GetData4();
+		ToHex(buffer + 19, data4[0], base);
+		ToHex(buffer + 21, data4[1], base);
+
+		const auto& data5 = value.GetData5();
+		ToHex(buffer + 24, data5[0], base);
+		ToHex(buffer + 26, data5[1], base);
+		ToHex(buffer + 28, data5[2], base);
+		ToHex(buffer + 30, data5[3], base);
+		ToHex(buffer + 32, data5[4], base);
+		ToHex(buffer + 34, data5[5], base);
 
 		return result;
 	}
