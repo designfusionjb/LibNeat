@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="Neat::Exception">
+		<DisplayString>{m_message,sb}</DisplayString>
+		<Expand>
+			<Item Name="[message]">m_message</Item>
+		</Expand>
+	</Type>
+	<Type Name="Neat::ExceptionWithCode">
+		<DisplayString>{m_errorCode,hr}</DisplayString>
+		<Expand>
+			<Item Name="[errorCode]">m_errorCode</Item>
+		</Expand>
+	</Type>
+	<Type Name="Neat::BufferT&lt;*&gt;">
+		<DisplayString>{m_buffer,x}</DisplayString>
+		<Expand>
+			<Item Name="[buffer]">m_buffer</Item>
+			<Item Name="[sizeInBytes]">m_size</Item>
+		</Expand>
+	</Type>
+	<Type Name="Neat::StringT&lt;char,*&gt;">
+		<DisplayString>{m_buffer,s8}</DisplayString>
+		<StringView>m_buffer,s8</StringView>
+		<Expand>
+			<Item Name="[buffer]">m_buffer</Item>
+			<Item Name="[sizeInBytes]">m_size</Item>
+		</Expand>
+	</Type>
+	<Type Name="Neat::StringT&lt;wchar_t,*&gt;">
+		<DisplayString>{m_buffer,su}</DisplayString>
+		<StringView>m_buffer,su</StringView>
+		<Expand>
+			<Item Name="[buffer]">m_buffer</Item>
+			<Item Name="[sizeInBytes]">m_size</Item>
+		</Expand>
+	</Type>
+	<Type Name="Neat::Uuid">
+		<DisplayString>{(*(GUID*)m_raw)}</DisplayString>
+	</Type>
+</AutoVisualizer>
