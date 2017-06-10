@@ -536,4 +536,26 @@ namespace Neat::Convert
 	{
 		return ToUuidT(value);
 	}
+
+	//
+	// ToString
+	//
+
+	std::wstring ToString(const Utf8& value)
+	{
+		std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+		const auto result = convert.from_bytes(value);
+		return result;
+	}
+
+	std::wstring ToString(const Utf16& value)
+	{
+		return std::wstring(value);
+	}
+
+	std::wstring ToString(const Uuid& value)
+	{
+		const auto result = ToUtf16(value);
+		return std::wstring(result);
+	}
 }

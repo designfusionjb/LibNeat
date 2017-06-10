@@ -15,18 +15,24 @@ namespace Neat
 		Uuid();
 		Uuid(std::initializer_list<byte_t> list);
 
+		Uuid(Uuid&& other);
+		Uuid(const Uuid& other);
+
+		Uuid& operator=(Uuid&& other);
+		Uuid& operator=(const Uuid& other);
+
 		static constexpr size_t SizeInBytes();
 		static constexpr size_t LengthInHex();
 
 		static constexpr uint16_t Version();
 		static constexpr uint16_t Variant();
 
-		bool operator<(const Uuid& other);
-		bool operator<=(const Uuid& other);
-		bool operator>(const Uuid& other);
-		bool operator>=(const Uuid& other);
-		bool operator==(const Uuid& other);
-		bool operator!=(const Uuid& other);
+		bool operator<(const Uuid& other) const;
+		bool operator<=(const Uuid& other) const;
+		bool operator>(const Uuid& other) const;
+		bool operator>=(const Uuid& other) const;
+		bool operator==(const Uuid& other) const;
+		bool operator!=(const Uuid& other) const;
 
 		uint32_t& GetData1();
 		uint16_t& GetData2();
@@ -59,6 +65,30 @@ namespace Neat
 		memset(m_raw, 0, sizeof(m_raw));
 	}
 
+	inline Uuid::Uuid(Uuid&& other)
+	{
+		memcpy_s(m_raw, sizeof(m_raw), other.m_raw, sizeof(other.m_raw));
+		memset(other.m_raw, 0, sizeof(other.m_raw));
+	}
+
+	inline Uuid::Uuid(const Uuid& other)
+	{
+		memcpy_s(m_raw, sizeof(m_raw), other.m_raw, sizeof(other.m_raw));
+	}
+
+	inline Uuid& Uuid::operator=(Uuid&& other)
+	{
+		memcpy_s(m_raw, sizeof(m_raw), other.m_raw, sizeof(other.m_raw));
+		memset(other.m_raw, 0, sizeof(other.m_raw));
+		return *this;
+	}
+
+	inline Uuid& Uuid::operator=(const Uuid& other)
+	{
+		memcpy_s(m_raw, sizeof(m_raw), other.m_raw, sizeof(other.m_raw));
+		return *this;
+	}
+
 	inline constexpr size_t Uuid::SizeInBytes()
 	{
 		return 16_sz;
@@ -79,32 +109,32 @@ namespace Neat
 		return 0b10; // variant 1
 	}
 
-	inline bool Uuid::operator<(const Uuid& other)
+	inline bool Uuid::operator<(const Uuid& other) const
 	{
 		return memcmp(m_raw, other.m_raw, sizeof(m_raw)) < 0;
 	}
 
-	inline bool Uuid::operator<=(const Uuid& other)
+	inline bool Uuid::operator<=(const Uuid& other) const
 	{
 		return memcmp(m_raw, other.m_raw, sizeof(m_raw)) <= 0;
 	}
 
-	inline bool Uuid::operator>(const Uuid& other)
+	inline bool Uuid::operator>(const Uuid& other) const
 	{
 		return !operator<=(other);
 	}
 
-	inline bool Uuid::operator>=(const Uuid& other)
+	inline bool Uuid::operator>=(const Uuid& other) const
 	{
 		return !operator<(other);
 	}
 
-	inline bool Uuid::operator==(const Uuid& other)
+	inline bool Uuid::operator==(const Uuid& other) const
 	{
 		return 0 == memcmp(m_raw, other.m_raw, sizeof(m_raw));
 	}
 
-	inline bool Uuid::operator!=(const Uuid& other)
+	inline bool Uuid::operator!=(const Uuid& other) const
 	{
 		return !operator==(other);
 	}

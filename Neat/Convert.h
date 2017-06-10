@@ -73,5 +73,13 @@ namespace Neat::Convert
 
 	Uuid ToUuid(const char* value);
 	Uuid ToUuid(const wchar_t* value);
+
+	//
+	// ToString
+	//
+
+	std::wstring ToString(const Utf8& value);
+	std::wstring ToString(const Utf16& value);
+	std::wstring ToString(const Uuid& value);
 }
 

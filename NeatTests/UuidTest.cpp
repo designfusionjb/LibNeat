@@ -13,6 +13,8 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Neat
 {
+	using Convert::ToString;
+
 	TEST_CLASS(UuidTest)
 	{
 	public:
@@ -34,6 +36,23 @@ namespace Neat
 
 			Assert::AreEqual<uint32_t>(Uuid::Version(), uuid.GetVersion());
 			Assert::AreEqual<uint32_t>(Uuid::Variant(), uuid.GetVariant());
+
+			{
+				Uuid copy(uuid);
+				Assert::AreEqual(copy, uuid);
+
+				Uuid move(std::move(copy));
+				Assert::AreEqual(copy, Uuid());
+				Assert::AreEqual(move, uuid);
+			}
+			{
+				Uuid copy = uuid;
+				Assert::AreEqual(copy, uuid);
+
+				Uuid move = std::move(copy);
+				Assert::AreEqual(copy, Uuid());
+				Assert::AreEqual(move, uuid);
+			}
 		}
 
 		TEST_METHOD(Uuid_Generate)
