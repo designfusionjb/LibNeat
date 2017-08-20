@@ -412,7 +412,7 @@ namespace Neat
 	}
 
 	template <typename T, typename Traits>
-	size_t StringT<T, Traits>::Find(const T* what, size_t from = 0) const
+	size_t StringT<T, Traits>::Find(const T* what, size_t from) const
 	{
 		if (nullptr == m_buffer)
 		{
