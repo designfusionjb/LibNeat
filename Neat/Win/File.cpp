@@ -32,6 +32,26 @@ namespace Neat::Win
 		return file;
 	}
 
+	void File::Delete(LPCWSTR lpFileName)
+	{
+		auto success = ::DeleteFileW(lpFileName);
+		if (!success)
+			throw LastErrorException();
+	}
+
+	ULONGLONG File::GetSize() const
+	{
+		LARGE_INTEGER size = { 0 };
+		auto success = ::GetFileSizeEx(
+			m_handle,
+			&size);
+
+		if (!success)
+			throw LastErrorException();
+
+		return static_cast<ULONGLONG>(size.QuadPart);
+	}
+
 	DWORD File::Read(
 		LPVOID lpBuffer,
 		DWORD nBytes,
@@ -65,18 +85,5 @@ namespace Neat::Win
 
 		if (!success)
 			throw LastErrorException();
-	}
-
-	ULONGLONG File::GetSize() const
-	{
-		LARGE_INTEGER size = { 0 };
-		auto success = ::GetFileSizeEx(
-			m_handle,
-			&size);
-
-		if (!success)
-			throw LastErrorException();
-
-		return static_cast<ULONGLONG>(size.QuadPart);
 	}
 }

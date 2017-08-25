@@ -18,6 +18,10 @@ namespace Neat::Win
 			LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr,
 			HANDLE hTemplateFile = nullptr);
 
+		static void Delete(LPCWSTR lpFileName);
+
+		ULONGLONG GetSize() const;
+
 		DWORD Read(
 			LPVOID lpBuffer,
 			DWORD nBytes,
@@ -27,8 +31,6 @@ namespace Neat::Win
 			LPCVOID lpBuffer,
 			DWORD nBytes,
 			LPOVERLAPPED lpOverlapped = nullptr);
-
-		ULONGLONG GetSize() const;
 
 	private:
 		Handle m_handle;
