@@ -32,6 +32,24 @@ namespace Neat::Win
 		return file;
 	}
 
+	DWORD File::Read(
+		LPVOID lpBuffer,
+		DWORD nBytes,
+		LPOVERLAPPED lpOverlapped) const
+	{
+		DWORD nRead = 0;
+		auto success = ::ReadFile(
+			m_handle,
+			lpBuffer,
+			nBytes,
+			&nRead,
+			lpOverlapped);
+
+		if (!success)
+			throw LastErrorException();
+		return nRead;
+	}
+
 	void File::Write(
 		LPCVOID lpBuffer,
 		DWORD nBytes,
@@ -47,5 +65,18 @@ namespace Neat::Win
 
 		if (!success)
 			throw LastErrorException();
+	}
+
+	ULONGLONG File::GetSize() const
+	{
+		LARGE_INTEGER size = { 0 };
+		auto success = ::GetFileSizeEx(
+			m_handle,
+			&size);
+
+		if (!success)
+			throw LastErrorException();
+
+		return static_cast<ULONGLONG>(size.QuadPart);
 	}
 }
