@@ -6,45 +6,267 @@
 
 namespace Neat::Win
 {
-	class Path : public String
+	template <typename T>
+	class PathT : public StringT<T>
 	{
-		typedef String Base;
+		typedef StringT<T> Base;
 
 	public:
-		Path(const wchar_t* path = nullptr);
-		Path(String&& path);
+		PathT(const T* path = nullptr);
+		PathT(StringT<T>&& path);
 
-		Path(Path&& other);
-		Path(const Path& other);
+		PathT(PathT&& other);
+		PathT(const PathT& other);
 
-		Path& operator=(Path&& other);
-		Path& operator=(const Path& other);
+		PathT& operator=(PathT&& other);
+		PathT& operator=(const PathT& other);
 
-		Path& operator+=(const Path& other);
-		Path operator+(const Path& other) const;
+		PathT& operator+=(const PathT& other);
+		PathT operator+(const PathT& other) const;
 
-		void Append(const wchar_t* path, size_t length = End);
-		void Append(const wchar_t t) = delete;
+		void Append(const T* path, size_t length = Base::End);
+		void Append(const T t) = delete;
 
-		void ReplaceName(const String& other);
-		void ReplaceFullName(const String& other);
-		void ReplaceExtension(const String& other);
-		void ReplaceDirectory(const String& other);
+		void ReplaceName(const StringT<T>& other);
+		void ReplaceFullName(const StringT<T>& other);
+		void ReplaceExtension(const StringT<T>& other);
+		void ReplaceDirectory(const StringT<T>& other);
 
-		String GetName() const;
-		String GetNameWithoutExtension() const;
-		String GetFolder() const;
+		StringT<T> GetName() const;
+		StringT<T> GetNameWithoutExtension() const;
+		StringT<T> GetFolder() const;
 
-		static Path GetCurrent();
-		static Path UrlToWin32(const wchar_t* url);
-		static Path GetFileName(String cmdLine);
-		static Path NtToWin32(const wchar_t* ntPath, bool kernelRules);
-		static Path SearchFullPath(const wchar_t* fileName);
-		static Path GetFullPath(const wchar_t* path);
-		static std::pair<String, String> SplitCommandLine(const wchar_t* commandLine);
+		static PathT GetCurrent();
+		static PathT UrlToWin32(const T* url);
+		static PathT GetFileName(StringT<T> cmdLine);
+		static PathT NtToWin32(const T* ntPath, bool kernelRules);
+		static PathT SearchFullPath(const T* fileName);
+		static PathT GetFullPath(const T* path);
+		static std::pair<StringT<T>, StringT<T>> SplitCommandLine(const T* commandLine);
 
 	protected:
-		void MoveFrom(Path& other);
-		void CopyFrom(const Path& other);
+		void MoveFrom(PathT& other);
+		void CopyFrom(const PathT& other);
 	};
+
+	template <typename T>
+	PathT<T>::PathT(const T* path)
+		: Base(path)
+	{
+	}
+
+	template <typename T>
+	PathT<T>::PathT(StringT<T>&& path) :
+		Base(std::move(path))
+	{
+	}
+
+	template <typename T>
+	PathT<T>::PathT(PathT&& other)
+	{
+		MoveFrom(other);
+	}
+
+	template <typename T>
+	PathT<T>::PathT(const PathT& other)
+	{
+		CopyFrom(other);
+	}
+
+	template <typename T>
+	PathT<T>& PathT<T>::operator=(PathT&& other)
+	{
+		MoveFrom(other);
+		return *this;
+	}
+
+	template <typename T>
+	PathT<T>& PathT<T>::operator=(const PathT& other)
+	{
+		CopyFrom(other);
+		return *this;
+	}
+
+	template <typename T>
+	PathT<T>& PathT<T>::operator+=(const PathT& other)
+	{
+		Append(other);
+		return *this;
+	}
+
+	template <typename T>
+	PathT<T> PathT<T>::operator+(const PathT& other) const
+	{
+		PathT path(*this);
+		path.Append(other);
+		return path;
+	}
+
+	template <typename T>
+	void PathT<T>::Append(const T* path, size_t length)
+	{
+		if (Base::End == length)
+			length = Base::GetLength(path);
+
+		if (0 == length)
+			return;
+
+		if (IsEmpty())
+		{
+			Base::Append(path, length);
+			return;
+		}
+
+		if (!EndsWith('\\'))
+		{
+			if (path[0_sz] != '\\')
+				Base::Append('\\');
+
+			Base::Append(path, length);
+		}
+		else
+		{
+			if (path[0_sz] == '\\')
+				Base::Append(path + 1, length - 1);
+			else
+				Base::Append(path, length);
+		}
+	}
+
+	template <typename T>
+	void PathT<T>::ReplaceName(const StringT<T>& name)
+	{
+		auto slash = FindLast('\\');
+		auto dot = FindLast('.');
+
+		if (Base::End != slash)
+		{
+			if (Base::End != dot)
+				Replace(++slash, dot, name);
+			else
+				Replace(++slash, name);
+		}
+		else
+		{
+			if (Base::End != dot)
+				Replace(0, dot, name);
+			else
+				static_cast<StringT<T>&>(*this) = name;
+		}
+	}
+
+	template <typename T>
+	void PathT<T>::ReplaceFullName(const StringT<T>& fullName)
+	{
+		auto slash = FindLast('\\');
+		if (Base::End != slash)
+			Replace(++slash, fullName);
+		else
+			static_cast<StringT<T>&>(*this) = fullName;
+	}
+
+	template <typename T>
+	void PathT<T>::ReplaceExtension(const StringT<T>& ext)
+	{
+		auto dot = FindLast('.');
+		if (Base::End != dot)
+		{
+			Replace(++dot, ext);
+		}
+		else
+		{
+			static_cast<StringT<T>&>(*this) += '.';
+			static_cast<StringT<T>&>(*this) += ext;
+		}
+	}
+
+	template <typename T>
+	void PathT<T>::ReplaceDirectory(const StringT<T>& dir)
+	{
+		auto slash = FindLast('\\');
+		if (Base::End != slash)
+		{
+			Replace(0, slash, dir);
+		}
+		else
+		{
+			auto temp = *this;
+			static_cast<StringT<T>&>(*this) = dir;
+			Append(temp);
+		}
+	}
+
+	template <typename T>
+	StringT<T> PathT<T>::GetName() const
+	{
+		auto slash = FindLast('\\');
+		if (Base::End != slash)
+			return Substring(++slash);
+		return *this;
+	}
+
+	template <typename T>
+	StringT<T> PathT<T>::GetNameWithoutExtension() const
+	{
+		auto dot = FindLast('.');
+		auto slash = FindLast('\\');
+		if (Base::End != slash)
+		{
+			slash++;
+			if (Base::End != dot && dot >= slash)
+			{
+				auto size = dot - slash;
+				return Substring(slash, size);
+			}
+			else
+			{
+				return Substring(slash);
+			}
+		}
+		else if (Base::End != dot)
+		{
+			return Substring(0, dot);
+		}
+		return *this;
+	}
+
+	template <typename T>
+	StringT<T> PathT<T>::GetFolder() const
+	{
+		auto slash = FindLast('\\');
+		if (0 == slash)
+			return *this;
+
+		if (Base::End != slash)
+		{
+			if (m_buffer[slash - 1] == ':')
+				return Substring(0, slash + 1);
+			return Substring(0, slash);
+		}
+		return StringT<T>(0, nullptr);
+	}
+
+	template <typename T>
+	void PathT<T>::MoveFrom(PathT& other)
+	{
+		if (this != &other)
+		{
+			Base::MoveFrom(other);
+		}
+	}
+
+	template <typename T>
+	void PathT<T>::CopyFrom(const PathT& other)
+	{
+		if (this != &other)
+		{
+			Base::CopyFrom(other);
+		}
+	}
+
+	typedef PathT<char> Path8;
+	typedef PathT<wchar_t> Path16;
+
+	// Default for Windows platform
+	using Path = Path16;
 }

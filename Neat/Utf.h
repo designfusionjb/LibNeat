@@ -25,7 +25,9 @@ namespace Neat
 		static bool OneOf(const T t, const T* set);
 		static int32_t Compare(const T* left, const T* right);
 		static int32_t Compare(const T* left, const T* right, size_t length);
+		static const T* Find(const T* string, const T what);
 		static const T* Find(const T* string, const T* what);
+		static const T* FindLast(const T* string, const T what);
 		static const T* FindLast(const T* string, const T* what);
 	};
 
@@ -127,7 +129,9 @@ namespace Neat
 		void Append(const T* string, size_t length = End);
 		void Append(const T t);
 
+		size_t Find(const T what, size_t from = 0) const;
 		size_t Find(const T* what, size_t from = 0) const;
+		size_t FindLast(const T what) const;
 		size_t FindLast(const T* what) const;
 
 		void Replace(const T* what, const T* with);
@@ -140,8 +144,11 @@ namespace Neat
 		StringT ToLower() const;
 		StringT ToUpper() const;
 
+		bool BeginsWith(const T what) const;
 		bool BeginsWith(const T* what) const;
+		bool EndsWith(const T what) const;
 		bool EndsWith(const T* what) const;
+		bool Contains(const T what) const;
 		bool Contains(const T* what) const;
 		bool Match(const T* wildcard) const;
 
@@ -155,6 +162,10 @@ namespace Neat
 		void TrimRight(const T* what);
 
 		static size_t GetLength(const T* string);
+		static StringT CopyBefore(
+			const T* string,
+			const T separator,
+			IAllocator* allocator = nullptr);
 
 		template <typename... Ts>
 		static StringT Format(const T* format, const Ts&... ts);
@@ -412,6 +423,22 @@ namespace Neat
 	}
 
 	template <typename T, typename Traits>
+	size_t StringT<T, Traits>::Find(const T what, size_t from) const
+	{
+		if (nullptr == m_buffer)
+			return End;
+
+		if (from >= m_size)
+			return End;
+
+		const auto where = Traits::Find(m_buffer + from, what);
+		if (nullptr == where)
+			return End;
+
+		return where - m_buffer;
+	}
+
+	template <typename T, typename Traits>
 	size_t StringT<T, Traits>::Find(const T* what, size_t from) const
 	{
 		if (nullptr == m_buffer)
@@ -435,6 +462,19 @@ namespace Neat
 			return End;
 
 		const auto where = Traits::Find(m_buffer + from, what);
+		if (nullptr == where)
+			return End;
+
+		return where - m_buffer;
+	}
+
+	template <typename T, typename Traits>
+	size_t StringT<T, Traits>::FindLast(const T what) const
+	{
+		if (nullptr == m_buffer)
+			return End;
+
+		const auto where = Traits::FindLast(m_buffer, what);
 		if (nullptr == where)
 			return End;
 
@@ -544,6 +584,15 @@ namespace Neat
 	}
 
 	template <typename T, typename Traits>
+	bool StringT<T, Traits>::BeginsWith(const T what) const
+	{
+		if (nullptr == m_buffer)
+			return false;
+
+		return m_buffer[0] == what;
+	}
+
+	template <typename T, typename Traits>
 	bool StringT<T, Traits>::BeginsWith(const T* what) const
 	{
 		if (nullptr == what)
@@ -556,7 +605,23 @@ namespace Neat
 		if (0 == whatLength)
 			return true;
 
+		if (nullptr == m_buffer)
+			return false;
+
 		return 0 == Traits::Compare(m_buffer, what, whatLength);
+	}
+
+	template <typename T, typename Traits>
+	bool StringT<T, Traits>::EndsWith(const T what) const
+	{
+		if (nullptr == m_buffer)
+			return false;
+
+		const auto thisLength = Traits::GetLength(m_buffer);
+		if (0 == thisLength)
+			return false;
+
+		return m_buffer[thisLength - 1] == what;
 	}
 
 	template <typename T, typename Traits>
@@ -572,12 +637,21 @@ namespace Neat
 		if (0 == whatLength)
 			return true;
 
+		if (nullptr == m_buffer)
+			return false;
+
 		const auto thisLength = Traits::GetLength(m_buffer);
 		if (thisLength < whatLength)
 			return false;
 
 		const auto pos = thisLength - whatLength;
 		return 0 == Traits::Compare(m_buffer + pos, what);
+	}
+
+	template <typename T, typename Traits>
+	bool StringT<T, Traits>::Contains(const T what) const
+	{
+		return End != Find(what);
 	}
 
 	template <typename T, typename Traits>
@@ -759,6 +833,23 @@ namespace Neat
 	size_t StringT<T, Traits>::GetLength(const T* string)
 	{
 		return Traits::GetLength(string);
+	}
+
+	template <typename T, typename Traits>
+	StringT<T, Traits> StringT<T, Traits>::CopyBefore(
+		const T* string,
+		const T separator,
+		IAllocator* allocator)
+	{
+		if (nullptr == string)
+			return StringT();
+
+		const auto pos = Traits::Find(string, separator);
+		if (nullptr == pos)
+			return StringT(string, End, allocator);
+
+		const auto length = pos - string;
+		return StringT(string, length, allocator);
 	}
 
 	template <typename T, typename Traits>

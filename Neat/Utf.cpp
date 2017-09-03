@@ -95,9 +95,19 @@ namespace Neat
 		return _mbsncmp((const byte_t*)left, (const byte_t*)right, length);
 	}
 
+	const char* Utf8Traits::Find(const char* string, const char what)
+	{
+		return (const char*)_mbschr((const byte_t*)string, what);
+	}
+
 	const char* Utf8Traits::Find(const char* string, const char* what)
 	{
 		return (const char*)_mbsstr((const byte_t*)string, (const byte_t*)what);
+	}
+
+	const char* Utf8Traits::FindLast(const char* string, const char what)
+	{
+		return (const char*)_mbsrchr((const byte_t*)string, what);
 	}
 
 	//
@@ -179,8 +189,18 @@ namespace Neat
 		return wcsncmp(left, right, length);
 	}
 
+	const wchar_t* Utf16Traits::Find(const wchar_t* string, const wchar_t what)
+	{
+		return wcschr(string, what);
+	}
+
 	const wchar_t* Utf16Traits::Find(const wchar_t* string, const wchar_t* what)
 	{
 		return wcsstr(string, what);
+	}
+
+	const wchar_t* Utf16Traits::FindLast(const wchar_t* string, const wchar_t what)
+	{
+		return wcsrchr(string, what);
 	}
 }

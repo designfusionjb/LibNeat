@@ -512,6 +512,8 @@ namespace Neat
 				Utf8 utf8;
 				Utf16 utf16;
 
+				Assert::AreEqual(Utf8::End, utf8.Find('1'));
+				Assert::AreEqual(Utf16::End, utf16.Find(L'1'));
 				Assert::AreEqual(Utf8::End, utf8.Find("123"));
 				Assert::AreEqual(Utf16::End, utf16.Find(L"123"));
 			}
@@ -519,6 +521,8 @@ namespace Neat
 				Utf8 utf8("123");
 				Utf16 utf16(L"123");
 
+				Assert::AreEqual(Utf8::End, utf8.Find('1', 1));
+				Assert::AreEqual(Utf16::End, utf16.Find(L'1', 1));
 				Assert::AreEqual(Utf8::End, utf8.Find("123", 1));
 				Assert::AreEqual(Utf16::End, utf16.Find(L"123", 1));
 			}
@@ -526,6 +530,8 @@ namespace Neat
 				Utf8 utf8("123");
 				Utf16 utf16(L"123");
 
+				Assert::AreEqual(Utf8::End, utf8.Find('1', 4));
+				Assert::AreEqual(Utf16::End, utf16.Find(L'1', 4));
 				Assert::AreEqual(Utf8::End, utf8.Find("123", 4));
 				Assert::AreEqual(Utf16::End, utf16.Find(L"123", 4));
 			}
@@ -547,6 +553,12 @@ namespace Neat
 				Utf8 utf8("123");
 				Utf16 utf16(L"123");
 
+				Assert::AreEqual(0_sz, utf8.Find('1'));
+				Assert::AreEqual(0_sz, utf16.Find(L'1'));
+				Assert::AreEqual(1_sz, utf8.Find('2'));
+				Assert::AreEqual(1_sz, utf16.Find(L'2'));
+				Assert::AreEqual(2_sz, utf8.Find('3'));
+				Assert::AreEqual(2_sz, utf16.Find(L'3'));
 				Assert::AreEqual(0_sz, utf8.Find("123"));
 				Assert::AreEqual(0_sz, utf16.Find(L"123"));
 			}
@@ -593,6 +605,8 @@ namespace Neat
 				Utf8 utf8;
 				Utf16 utf16;
 
+				Assert::AreEqual(Utf8::End, utf8.FindLast('/'));
+				Assert::AreEqual(Utf16::End, utf16.FindLast(L'/'));
 				Assert::AreEqual(Utf8::End, utf8.FindLast("/"));
 				Assert::AreEqual(Utf16::End, utf16.FindLast(L"/"));
 			}
@@ -601,6 +615,8 @@ namespace Neat
 				Utf8 utf8("/some");
 				Utf16 utf16(L"/some");
 
+				Assert::AreEqual(0_sz, utf8.FindLast('/'));
+				Assert::AreEqual(0_sz, utf16.FindLast(L'/'));
 				Assert::AreEqual(0_sz, utf8.FindLast("/"));
 				Assert::AreEqual(0_sz, utf16.FindLast(L"/"));
 			}
@@ -609,6 +625,8 @@ namespace Neat
 				Utf8 utf8("/some/path");
 				Utf16 utf16(L"/some/path");
 
+				Assert::AreEqual(5_sz, utf8.FindLast('/'));
+				Assert::AreEqual(5_sz, utf16.FindLast(L'/'));
 				Assert::AreEqual(5_sz, utf8.FindLast("/"));
 				Assert::AreEqual(5_sz, utf16.FindLast(L"/"));
 			}
@@ -617,6 +635,8 @@ namespace Neat
 				Utf8 utf8("/some/path/");
 				Utf16 utf16(L"/some/path/");
 
+				Assert::AreEqual(10_sz, utf8.FindLast('/'));
+				Assert::AreEqual(10_sz, utf16.FindLast(L'/'));
 				Assert::AreEqual(10_sz, utf8.FindLast("/"));
 				Assert::AreEqual(10_sz, utf16.FindLast(L"/"));
 			}
@@ -641,9 +661,13 @@ namespace Neat
 				Utf8 utf8(R"(C:\Dir\SubDir\FileName.Ext)");
 				Utf16 utf16(LR"(C:\Dir\SubDir\FileName.Ext)");
 
+				Assert::AreEqual(13_sz, utf8.FindLast('\\'));
+				Assert::AreEqual(13_sz, utf16.FindLast(L'\\'));
 				Assert::AreEqual(13_sz, utf8.FindLast("\\"));
 				Assert::AreEqual(13_sz, utf16.FindLast(L"\\"));
 
+				Assert::AreEqual(22_sz, utf8.FindLast('.'));
+				Assert::AreEqual(22_sz, utf16.FindLast(L'.'));
 				Assert::AreEqual(22_sz, utf8.FindLast("."));
 				Assert::AreEqual(22_sz, utf16.FindLast(L"."));
 			}
@@ -1111,7 +1135,13 @@ namespace Neat
 				Assert::IsTrue(Utf8().BeginsWith(""));
 				Assert::IsTrue(Utf8("").BeginsWith(nullptr));
 				Assert::IsTrue(Utf8("").BeginsWith(""));
+				Assert::IsTrue(Utf8("Abc").BeginsWith('A'));
 				Assert::IsTrue(Utf8("Abc").BeginsWith("A"));
+				Assert::IsFalse(Utf8().BeginsWith(' '));
+				Assert::IsFalse(Utf8().BeginsWith(" "));
+				Assert::IsFalse(Utf8("").BeginsWith(' '));
+				Assert::IsFalse(Utf8("").BeginsWith(" "));
+				Assert::IsFalse(Utf8("Abc").BeginsWith('b'));
 				Assert::IsFalse(Utf8("Abc").BeginsWith("b"));
 			}
 			{
@@ -1119,7 +1149,13 @@ namespace Neat
 				Assert::IsTrue(Utf16().BeginsWith(L""));
 				Assert::IsTrue(Utf16(L"").BeginsWith(nullptr));
 				Assert::IsTrue(Utf16(L"").BeginsWith(L""));
+				Assert::IsTrue(Utf16(L"Abc").BeginsWith(L'A'));
 				Assert::IsTrue(Utf16(L"Abc").BeginsWith(L"A"));
+				Assert::IsFalse(Utf16().BeginsWith(L' '));
+				Assert::IsFalse(Utf16().BeginsWith(L" "));
+				Assert::IsFalse(Utf16(L"").BeginsWith(L' '));
+				Assert::IsFalse(Utf16(L"").BeginsWith(L" "));
+				Assert::IsFalse(Utf16(L"Abc").BeginsWith(L'b'));
 				Assert::IsFalse(Utf16(L"Abc").BeginsWith(L"b"));
 			}
 		}
@@ -1134,9 +1170,15 @@ namespace Neat
 				Assert::IsTrue(Utf8("Some").EndsWith(""));
 				Assert::IsTrue(Utf8("Some").EndsWith("Some"));
 				Assert::IsTrue(Utf8("First, second, etc.").EndsWith("etc."));
+				Assert::IsTrue(Utf8("Some\\Path\\").EndsWith('\\'));
 				Assert::IsTrue(Utf8("Some\\Path\\").EndsWith("\\"));
+				Assert::IsFalse(Utf8().EndsWith(' '));
+				Assert::IsFalse(Utf8().EndsWith(" "));
+				Assert::IsFalse(Utf8("").EndsWith(' '));
+				Assert::IsFalse(Utf8("").EndsWith(" "));
 				Assert::IsFalse(Utf8("Som").EndsWith("Some"));
 				Assert::IsFalse(Utf8("First, second, etc.").EndsWith("etc.."));
+				Assert::IsFalse(Utf8("Some\\Path").EndsWith('\\'));
 				Assert::IsFalse(Utf8("Some\\Path").EndsWith("\\"));
 			}
 			{
@@ -1147,9 +1189,15 @@ namespace Neat
 				Assert::IsTrue(Utf16(L"Some").EndsWith(L""));
 				Assert::IsTrue(Utf16(L"Some").EndsWith(L"Some"));
 				Assert::IsTrue(Utf16(L"First, second, etc.").EndsWith(L"etc."));
+				Assert::IsTrue(Utf16(L"Some\\Path\\").EndsWith(L'\\'));
 				Assert::IsTrue(Utf16(L"Some\\Path\\").EndsWith(L"\\"));
+				Assert::IsFalse(Utf16().EndsWith(L' '));
+				Assert::IsFalse(Utf16().EndsWith(L" "));
+				Assert::IsFalse(Utf16(L"").EndsWith(L' '));
+				Assert::IsFalse(Utf16(L"").EndsWith(L" "));
 				Assert::IsFalse(Utf16(L"Som").EndsWith(L"Some"));
 				Assert::IsFalse(Utf16(L"First, second, etc.").EndsWith(L"etc.."));
+				Assert::IsFalse(Utf16(L"Some\\Path").EndsWith(L'\\'));
 				Assert::IsFalse(Utf16(L"Some\\Path").EndsWith(L"\\"));
 			}
 		}
@@ -1163,8 +1211,13 @@ namespace Neat
 				Assert::IsTrue(Utf8("").Contains(""));
 				Assert::IsTrue(Utf8("Some").Contains(""));
 				Assert::IsTrue(Utf8("Some").Contains("Some"));
+				Assert::IsTrue(Utf8("Some").Contains('S'));
+				Assert::IsTrue(Utf8("Some").Contains('o'));
+				Assert::IsTrue(Utf8("Some").Contains('m'));
+				Assert::IsTrue(Utf8("Some").Contains('e'));
 				Assert::IsTrue(Utf8("First, second, etc.").Contains("etc."));
 				Assert::IsFalse(Utf8().Contains("Some"));
+				Assert::IsFalse(Utf8("Som").Contains('s'));
 				Assert::IsFalse(Utf8("Som").Contains("Some"));
 				Assert::IsFalse(Utf8("First, second, etc.").Contains("etc.."));
 			}
@@ -1175,8 +1228,13 @@ namespace Neat
 				Assert::IsTrue(Utf16(L"").Contains(L""));
 				Assert::IsTrue(Utf16(L"Some").Contains(L""));
 				Assert::IsTrue(Utf16(L"Some").Contains(L"Some"));
+				Assert::IsTrue(Utf16(L"Some").Contains(L'S'));
+				Assert::IsTrue(Utf16(L"Some").Contains(L'o'));
+				Assert::IsTrue(Utf16(L"Some").Contains(L'm'));
+				Assert::IsTrue(Utf16(L"Some").Contains(L'e'));
 				Assert::IsTrue(Utf16(L"First, second, etc.").Contains(L"etc."));
 				Assert::IsFalse(Utf16().Contains(L"Some"));
+				Assert::IsFalse(Utf16(L"Som").Contains(L's'));
 				Assert::IsFalse(Utf16(L"Som").Contains(L"Some"));
 				Assert::IsFalse(Utf16(L"First, second, etc.").Contains(L"etc.."));
 			}
@@ -1418,6 +1476,21 @@ namespace Neat
 				const auto capacity = alloc.GetCapacity();
 				Assert::AreEqual(0_sz, capacity);
 			}
+		}
+
+		TEST_METHOD(String_CopyBefore)
+		{
+			Assert::AreEqual(nullptr, Utf8::CopyBefore(nullptr, '/'));
+			Assert::AreEqual(nullptr, Utf16::CopyBefore(nullptr, L'/'));
+
+			Assert::AreEqual("", Utf8::CopyBefore("", '/'));
+			Assert::AreEqual(L"", Utf16::CopyBefore(L"", L'/'));
+
+			Assert::AreEqual("some", Utf8::CopyBefore("some", '/'));
+			Assert::AreEqual(L"some", Utf16::CopyBefore(L"some", L'/'));
+
+			Assert::AreEqual("some", Utf8::CopyBefore("some/path", '/'));
+			Assert::AreEqual(L"some", Utf16::CopyBefore(L"some/path", L'/'));
 		}
 	};
 }

@@ -10,175 +10,239 @@ namespace Neat::Win
 	public:
 		TEST_METHOD(Path_Append)
 		{
-			[]() // Simplest case
+			// Simplest case
 			{
-				Path path;
-				Assert::AreEqual(nullptr, static_cast<const String&>(path));
+				Path8 path;
+				Assert::AreEqual(nullptr, path.GetString());
+
+				path.Append("Dir");
+				Assert::AreEqual("Dir", path.GetString());
+			
+				path.Append("SubDir");
+				Assert::AreEqual("Dir\\SubDir", path.GetString());
+			
+				path.Append("");
+				Assert::AreEqual("Dir\\SubDir", path.GetString());
+			}
+			{
+				Path16 path;
+				Assert::AreEqual(nullptr, path.GetString());
 
 				path.Append(L"Dir");
-				Assert::AreEqual(L"Dir", static_cast<const String&>(path));
-			
-				path.Append(L"SubDir");
-				Assert::AreEqual(L"Dir\\SubDir", static_cast<const String&>(path));
-			
-				path.Append(L"");
-				Assert::AreEqual(L"Dir\\SubDir", static_cast<const String&>(path));
-			}();
+				Assert::AreEqual(L"Dir", path.GetString());
 
-			[]() // More backslashes
+				path.Append(L"SubDir");
+				Assert::AreEqual(L"Dir\\SubDir", path.GetString());
+
+				path.Append(L"");
+				Assert::AreEqual(L"Dir\\SubDir", path.GetString());
+			}
+			// More backslashes
 			{
-				Path path(L"Dir\\");
-				Assert::AreEqual(L"Dir\\", static_cast<const String&>(path));
+				Path8 path("Dir\\");
+				Assert::AreEqual("Dir\\", path.GetString());
+
+				path.Append("\\SubDir");
+				Assert::AreEqual("Dir\\SubDir", path.GetString());
+			
+				path.Append("\\FileName.Ext");
+				Assert::AreEqual("Dir\\SubDir\\FileName.Ext", path.GetString());
+			}
+			{
+				Path16 path(L"Dir\\");
+				Assert::AreEqual(L"Dir\\", path.GetString());
 
 				path.Append(L"\\SubDir");
-				Assert::AreEqual(L"Dir\\SubDir", static_cast<const String&>(path));
-			
+				Assert::AreEqual(L"Dir\\SubDir", path.GetString());
+
 				path.Append(L"\\FileName.Ext");
-				Assert::AreEqual(L"Dir\\SubDir\\FileName.Ext", static_cast<const String&>(path));
-			}();
-
-			[]() // Several paths
+				Assert::AreEqual(L"Dir\\SubDir\\FileName.Ext", path.GetString());
+			}
+			// Several paths
 			{
-				Path path(L"RootDir\\");
+				Path8 path("RootDir\\");
 
-				path.Append(Path(L"Some\\Nested\\Dirs\\"));
-				Assert::AreEqual(L"RootDir\\Some\\Nested\\Dirs\\", static_cast<const String&>(path));
+				path.Append(Path8("Some\\Nested\\Dirs\\"));
+				Assert::AreEqual("RootDir\\Some\\Nested\\Dirs\\", path.GetString());
 
-				path.Append(Path(L"FileName.Ext"));
-				Assert::AreEqual(L"RootDir\\Some\\Nested\\Dirs\\FileName.Ext", static_cast<const String&>(path));
-			}();
+				path.Append(Path8("FileName.Ext"));
+				Assert::AreEqual("RootDir\\Some\\Nested\\Dirs\\FileName.Ext", path.GetString());
+			}
+			{
+				Path16 path(L"RootDir\\");
+
+				path.Append(Path16(L"Some\\Nested\\Dirs\\"));
+				Assert::AreEqual(L"RootDir\\Some\\Nested\\Dirs\\", path.GetString());
+
+				path.Append(Path16(L"FileName.Ext"));
+				Assert::AreEqual(L"RootDir\\Some\\Nested\\Dirs\\FileName.Ext", path.GetString());
+			}
 		}
 		
 		TEST_METHOD(Path_ReplaceName)
 		{
-			[]() // Simplest case
+			// Simplest case
 			{
-				Path path(L"C:\\Dir\\SubDir\\FileName.Ext");
+				Path8 path("C:\\Dir\\SubDir\\FileName.Ext");
+
+				path.ReplaceName("AnotherName");
+				Assert::AreEqual("AnotherName.Ext", path.GetName());
+				Assert::AreEqual("C:\\Dir\\SubDir\\AnotherName.Ext", path.GetString());
+
+				path.ReplaceName("Small");
+				Assert::AreEqual("Small.Ext", path.GetName());
+				Assert::AreEqual("C:\\Dir\\SubDir\\Small.Ext", path.GetString());
+			}
+			{
+				Path16 path(L"C:\\Dir\\SubDir\\FileName.Ext");
 
 				path.ReplaceName(L"AnotherName");
-				Assert::AreEqual(L"AnotherName.Ext", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\AnotherName.Ext", static_cast<const String&>(path));
+				Assert::AreEqual(L"AnotherName.Ext", path.GetName());
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\AnotherName.Ext", path.GetString());
 
 				path.ReplaceName(L"Small");
-				Assert::AreEqual(L"Small.Ext", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\Small.Ext", static_cast<const String&>(path));
-			}();
-
-			[]() // No extension
+				Assert::AreEqual(L"Small.Ext", path.GetName());
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\Small.Ext", path.GetString());
+			}
+			// No extension
 			{
-				Path path(L"C:\\Dir\\SubDir\\FileName");
+				Path8 path("C:\\Dir\\SubDir\\FileName");
+
+				path.ReplaceName("AnotherName");
+				Assert::AreEqual("AnotherName", path.GetName());
+				Assert::AreEqual("C:\\Dir\\SubDir\\AnotherName", path.GetString());
+			}
+			{
+				Path16 path(L"C:\\Dir\\SubDir\\FileName");
 
 				path.ReplaceName(L"AnotherName");
-				Assert::AreEqual(L"AnotherName", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\AnotherName", static_cast<const String&>(path));
-			}();
-
-			[]() // No backslashes
+				Assert::AreEqual(L"AnotherName", path.GetName());
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\AnotherName", path.GetString());
+			}
+			// No backslashes
 			{
-				Path path(L"FileName.Ext");
+				Path8 path("FileName.Ext");
+
+				path.ReplaceName("AnotherName");
+				Assert::AreEqual("AnotherName.Ext", path.GetName());
+				Assert::AreEqual("AnotherName.Ext", path.GetString());
+
+				path.ReplaceName("Small");
+				Assert::AreEqual("Small.Ext", path.GetName());
+				Assert::AreEqual("Small.Ext", path.GetString());
+			}
+			{
+				Path16 path(L"FileName.Ext");
 
 				path.ReplaceName(L"AnotherName");
-				Assert::AreEqual(L"AnotherName.Ext", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"AnotherName.Ext", static_cast<const String&>(path));
+				Assert::AreEqual(L"AnotherName.Ext", path.GetName());
+				Assert::AreEqual(L"AnotherName.Ext", path.GetString());
 
 				path.ReplaceName(L"Small");
-				Assert::AreEqual(L"Small.Ext", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"Small.Ext", static_cast<const String&>(path));
-			}();
-
-			[]() // No extension and no backslashes
+				Assert::AreEqual(L"Small.Ext", path.GetName());
+				Assert::AreEqual(L"Small.Ext", path.GetString());
+			}
+			// No extension and no backslashes
 			{
-				Path path(L"FileName");
+				Path8 path("FileName");
+
+				path.ReplaceName("AnotherName");
+				Assert::AreEqual("AnotherName", path.GetName());
+				Assert::AreEqual("AnotherName", path.GetString());
+
+				path.ReplaceName("Small");
+				Assert::AreEqual("Small", path.GetName());
+				Assert::AreEqual("Small", path.GetString());
+			}
+			{
+				Path16 path(L"FileName");
 
 				path.ReplaceName(L"AnotherName");
-				Assert::AreEqual(L"AnotherName", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"AnotherName", static_cast<const String&>(path));
+				Assert::AreEqual(L"AnotherName", path.GetName());
+				Assert::AreEqual(L"AnotherName", path.GetString());
 
 				path.ReplaceName(L"Small");
-				Assert::AreEqual(L"Small", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"Small", static_cast<const String&>(path));
-			}();
+				Assert::AreEqual(L"Small", path.GetName());
+				Assert::AreEqual(L"Small", path.GetString());
+			}
 		}
 		
 		TEST_METHOD(Path_ReplaceFullName)
 		{
-			[]() // Full path
+			// Full path
 			{
-				Path path(L"C:\\Dir\\SubDir\\Name.Ext");
+				Path16 path(L"C:\\Dir\\SubDir\\Name.Ext");
 
 				path.ReplaceFullName(L"FullName.WithExt");
-				Assert::AreEqual(L"FullName.WithExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\FullName.WithExt", static_cast<const String&>(path));
+				Assert::AreEqual(L"FullName.WithExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\FullName.WithExt", path.GetString());
 
 				path.ReplaceFullName(L"FullNameWithOutExt");
-				Assert::AreEqual(L"FullNameWithOutExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\FullNameWithOutExt", static_cast<const String&>(path));
-			}();
-
-			[]() // No backslashes
+				Assert::AreEqual(L"FullNameWithOutExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\FullNameWithOutExt", path.GetString());
+			}
+			// No backslashes
 			{
-				Path path(L"Name.Ext");
+				Path16 path(L"Name.Ext");
 
 				path.ReplaceFullName(L"FullNameWithOutExt");
-				Assert::AreEqual(L"FullNameWithOutExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"FullNameWithOutExt", static_cast<const String&>(path));
+				Assert::AreEqual(L"FullNameWithOutExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"FullNameWithOutExt", path.GetString());
 
 				path.ReplaceFullName(L"FullName.WithExt");
-				Assert::AreEqual(L"FullName.WithExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"FullName.WithExt", static_cast<const String&>(path));
-			}();
+				Assert::AreEqual(L"FullName.WithExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"FullName.WithExt", path.GetString());
+			}
 		}
 		
 		TEST_METHOD(Path_ReplaceExtension)
 		{
-			[]() // Simplest case
+			// Simplest case
 			{
-				Path path(L"C:\\Dir\\SubDir\\FileName.Ext");
+				Path16 path(L"C:\\Dir\\SubDir\\FileName.Ext");
 
 				path.ReplaceExtension(L"AnotherExt");
-				Assert::AreEqual(L"FileName.AnotherExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.AnotherExt", static_cast<const String&>(path));
+				Assert::AreEqual(L"FileName.AnotherExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.AnotherExt", path.GetString());
 
 				path.ReplaceExtension(L"SomeExt");
-				Assert::AreEqual(L"FileName.SomeExt", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.SomeExt", static_cast<const String&>(path));
-			}();
-
-			[]() // Without extension
+				Assert::AreEqual(L"FileName.SomeExt", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.SomeExt", path.GetString());
+			}
+			// Without extension
 			{
-				Path path(L"C:\\Dir\\SubDir\\FileName");
+				Path16 path(L"C:\\Dir\\SubDir\\FileName");
 
 				path.ReplaceExtension(L"Ext");
-				Assert::AreEqual(L"FileName.Ext", static_cast<const String&>(path.GetName()));
-				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.Ext", static_cast<const String&>(path));
-			}();
+				Assert::AreEqual(L"FileName.Ext", static_cast<const Utf16&>(path.GetName()));
+				Assert::AreEqual(L"C:\\Dir\\SubDir\\FileName.Ext", path.GetString());
+			}
 		}
 		
 		TEST_METHOD(Path_ReplaceDirectory)
 		{
-			[]() // Simplest case
+			// Simplest case
 			{
-				Path path(L"D:\\Dir\\SubDir\\FileName.Ext");
+				Path16 path(L"D:\\Dir\\SubDir\\FileName.Ext");
 
 				path.ReplaceDirectory(L"C:\\AnotherDir\\OneMore");
-				Assert::AreEqual(L"C:\\AnotherDir\\OneMore\\FileName.Ext", static_cast<const String&>(path));
-			}();
-
-			[]() // Without backslashes
+				Assert::AreEqual(L"C:\\AnotherDir\\OneMore\\FileName.Ext", path.GetString());
+			}
+			// Without backslashes
 			{
-				Path path(L"FileName");
+				Path16 path(L"FileName");
 
 				path.ReplaceDirectory(L"Dir\\SubDir");
-				Assert::AreEqual(L"Dir\\SubDir\\FileName", static_cast<const String&>(path));
-			}();
+				Assert::AreEqual(L"Dir\\SubDir\\FileName", path.GetString());
+			}
 		}
 		
 		TEST_METHOD(Path_GetFileName)
 		{
 			auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 			{
-				auto path = Path::GetFileName(input);
-				Assert::AreEqual(expectedOutput, static_cast<const String&>(path));
+				auto path = Path16::GetFileName(input);
+				Assert::AreEqual(expectedOutput, path.GetString());
 			};
 
 			check(
@@ -241,8 +305,8 @@ namespace Neat::Win
 			{
 				auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 				{
-					auto path = Path::NtToWin32(input, true);
-					Assert::AreEqual(expectedOutput, static_cast<const String&>(path), true);
+					auto path = Path16::NtToWin32(input, true);
+					Assert::AreEqual(expectedOutput, path.GetString(), true);
 				};
 
 				check(
@@ -270,8 +334,8 @@ namespace Neat::Win
 			{
 				auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 				{
-					auto path = Path::NtToWin32(input, false);
-					Assert::AreEqual(expectedOutput, static_cast<const String&>(path), true);
+					auto path = Path16::NtToWin32(input, false);
+					Assert::AreEqual(expectedOutput, path.GetString(), true);
 				};
 
 				check(
@@ -300,7 +364,7 @@ namespace Neat::Win
 		{
 			auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 			{
-				Path path(input);
+				Path16 path(input);
 				Assert::AreEqual(expectedOutput, path.GetName());
 			};
 
@@ -337,7 +401,7 @@ namespace Neat::Win
 		{
 			auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 			{
-				Path path(input);
+				Path16 path(input);
 				Assert::AreEqual(expectedOutput, path.GetNameWithoutExtension());
 			};
 
@@ -382,7 +446,7 @@ namespace Neat::Win
 		{
 			auto check = [](const wchar_t* input, const wchar_t* expectedOutput)
 			{
-				Path path(input);
+				Path16 path(input);
 				Assert::AreEqual(expectedOutput, path.GetFolder());
 			};
 
@@ -418,8 +482,8 @@ namespace Neat::Win
 		TEST_METHOD(Path_SearchFullPath)
 		{
 			{
-				auto fileName = String(L"cmd.exe");
-				auto fullPath = Path::SearchFullPath(fileName);
+				auto fileName = Utf16(L"cmd.exe");
+				auto fullPath = Path16::SearchFullPath(fileName);
 				
 				Assert::IsFalse(fullPath.IsEmpty());
 				Assert::IsFalse(fullPath == fileName);
@@ -428,7 +492,7 @@ namespace Neat::Win
 
 			{
 				auto fileName = L"h384hsld0sh3njfd0ijfdd.exe";
-				auto fullPath = Path::SearchFullPath(fileName);
+				auto fullPath = Path16::SearchFullPath(fileName);
 				
 				Assert::IsTrue(fullPath == fileName);
 			}
@@ -440,16 +504,16 @@ namespace Neat::Win
 			{
 				Assert::ExpectException<std::runtime_error>([]()
 				{
-					Path::SplitCommandLine(nullptr);
+					Path16::SplitCommandLine(nullptr);
 				});
 				Assert::ExpectException<std::runtime_error>([]()
 				{
-					Path::SplitCommandLine(L"");
+					Path16::SplitCommandLine(L"");
 				});
 			}
 			// MSI
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					L"MsiExec.exe /X{FAAD7243-0141-3987-AA2F-E56B20F80E41}");
 
 				Assert::AreEqual(L"MsiExec.exe", pair.first);
@@ -457,7 +521,7 @@ namespace Neat::Win
 			}
 			// Single path with quotes
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					LR"("C:\Program Files\Wireshark\uninstall.exe")");
 
 				Assert::AreEqual(LR"(C:\Program Files\Wireshark\uninstall.exe)", pair.first);
@@ -465,7 +529,7 @@ namespace Neat::Win
 			}
 			// Single path without quotes
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					LR"(C:\Program Files (x86)\WinPcap\uninstall.exe)");
 
 				Assert::AreEqual(LR"(C:\Program Files (x86)\WinPcap\uninstall.exe)", pair.first);
@@ -473,7 +537,7 @@ namespace Neat::Win
 			}
 			// Complex path 1
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					LR"(rundll32.exe advpack.dll,LaunchINFSectionEx "C:\Program Files\Notepad2\Notepad2.inf",DefaultUninstall,,8,N)");
 
 				Assert::AreEqual(LR"(rundll32.exe)", pair.first);
@@ -481,7 +545,7 @@ namespace Neat::Win
 			}
 			// Complex path 2
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					LR"("C:\Program Files\Common Files\Microsoft Shared\ClickToRun\OfficeClickToRun.exe" scenario=install scenariosubtype=ARP sourcetype=None productstoremove=O365HomePremRetail.16_en-us_x-none culture=en-us)");
 
 				Assert::AreEqual(LR"(C:\Program Files\Common Files\Microsoft Shared\ClickToRun\OfficeClickToRun.exe)", pair.first);
@@ -489,7 +553,7 @@ namespace Neat::Win
 			}
 			// Complex path 3
 			{
-				const auto pair = Path::SplitCommandLine(
+				const auto pair = Path16::SplitCommandLine(
 					LR"(%windir%\system32\sdbinst.exe -u "C:\Windows\AppPatch\Custom\Custom64\{08274920-8908-45c2-9258-8ad67ff77b09}.sdb")");
 
 				Assert::AreEqual(LR"(%windir%\system32\sdbinst.exe)", pair.first);
